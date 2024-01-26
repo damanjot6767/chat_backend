@@ -1,8 +1,6 @@
 export const DB_NAME: string = 'chat'
 
-/**
- * @type {{ ADMIN: "ADMIN"; USER: "USER"} as const}
- */
+
 export const UserRolesEnum = {
     ADMIN: "ADMIN",
     USER: "USER",
@@ -10,9 +8,7 @@ export const UserRolesEnum = {
 
 export const AvailableUserRoles: string[] = Object.values(UserRolesEnum);
 
-/**
- * @description set of events that we are using in chat app. more to be added as we develop the chat app
- */
+
 export const ChatEventEnum = {
     CONNECTED_EVENT: "connected",
     DISCONNECT_EVENT: "disconnect",
@@ -27,3 +23,9 @@ export const ChatEventEnum = {
   } as const;
 
 export type ChatEvent = keyof typeof ChatEventEnum;
+
+
+export const cookieOptions = {
+  httpOnly: true,
+  secure: false, // Adjust this based on your environment (e.g., use `true` in production with HTTPS)
+};

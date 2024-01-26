@@ -2,9 +2,9 @@ import cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { Server, Socket } from "socket.io";
 import { ChatEvent, ChatEventEnum } from "../constants";
-import { ApiError } from "../utils/api-error";
 import { Request } from "express";
 import { UserModel } from "../models/index";
+import { ApiError } from "../utils/api-error";
 
 interface SocketWithUser extends Socket {
     user: any

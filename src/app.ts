@@ -5,8 +5,11 @@ import path from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import compression from 'compression';
+import logger from 'morgan'
 import { initializeSocketIO } from "./socket/index";
 import { Server } from "socket.io";
+import { userRouter } from "./routes";
+import { cookieOptions } from "./constants";
 
 const app = express();
 
@@ -33,6 +36,11 @@ app.use(express.urlencoded({ extended: true, limit: '20kb' }));
 app.use(express.static("public"));
 app.use(cookieParser());
 app.use(compression());
+app.use(logger('dev'));
+
+
+//-------------------Routes
+app.use("/v1/user", userRouter);
 
 initializeSocketIO(io);
 
