@@ -1,22 +1,27 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true,
-        "target": "es6",
-        "noImplicitAny": true,
-        "moduleResolution": "node",
-        "sourceMap": true,
-        "outDir": "dist",
-        "baseUrl": ".",
-        "paths": {
-            "*": [
-                "node_modules/*",
-                "src/*"
-            ]
-        }
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "module": "commonjs",
+      "target": "es2015",
+      "outDir": "./dist"
     },
     "include": [
-        "**/*"
+      "src/swagger-output.json",
+      "src/**/*"
+    ],
+    "exclude": [
+      "node_modules"
+    ],
+    "lib": [
+      "es2015"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "./src/types"
+    ],
+    "types": [
+      "node",
+      "express"
     ]
-}
+  }

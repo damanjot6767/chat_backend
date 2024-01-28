@@ -1,17 +1,14 @@
-import { UserCreateResponseDto } from 'controllers/users/dto/user-create-dto';
+import { UserResponseDto } from '../controllers/users/dto/index';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 
-interface CustomRequest extends Request {
-  user?: UserCreateResponseDto
-}
 
 const asyncHandler = (requestHandler: RequestHandler) => {
-  return async (req: CustomRequest, res: Response, next: NextFunction) => {
+  return async (req, res: Response, next: NextFunction) => {
     try {
       await Promise.resolve(requestHandler(req, res, next));
     } catch (err) {
-      res.status(err.statusCode).json({
-        statusCode: err.statusCode,
+      res.status(err?.statusCode || 400).json({
+        statusCode: err?.statusCode || 400,
         data: null,
         message: err.message
       })

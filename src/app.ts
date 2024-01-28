@@ -1,15 +1,17 @@
 import express from "express";
+import session from "express-session";
 import { createServer } from 'http';
 import fs from "fs";
 import path from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import compression from 'compression';
+import { passport } from "./passpost/index"
 import logger from 'morgan'
 import { initializeSocketIO } from "./socket/index";
 import { Server } from "socket.io";
-import { userRouter } from "./routes";
-import { cookieOptions } from "./constants";
+import { chatRouter, messageRouter, userRouter } from "./routes";
+
 
 const app = express();
 
@@ -39,9 +41,27 @@ app.use(compression());
 app.use(logger('dev'));
 
 
-//-------------------Routes
-app.use("/v1/user", userRouter);
+// required for passport
 
+app.use(passport.initialize());
+
+//-------------------Routes
+// app.use("/v1/user", userRouter);
+// app.use("/v1/chat/chats", chatRouter);
+app.use("/v1/message/messages", messageRouter);
+
+//-----------------Socket
 initializeSocketIO(io);
+
+
+//------------------Swagger setup
+import YAML from "yaml";
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerOptions } from "./constants";
+
+
+const specs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 export { app }
