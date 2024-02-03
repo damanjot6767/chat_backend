@@ -1,7 +1,7 @@
 import cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { Server, Socket } from "socket.io";
-import { ChatEvent, ChatEventEnum } from "../constants";
+import { ChatEventEnum } from "../constants";
 import { Request } from "express";
 import { UserModel } from "../models/index";
 import { ApiError } from "../utils/api-error";
@@ -22,6 +22,7 @@ const mountJoinChatEvent = (socket: SocketWithUser) => {
 
 const mountParticipantTypingEvent = (socket: SocketWithUser) => {
     socket.on(ChatEventEnum.TYPING_EVENT, (chatId: any) => {
+        console.log('5')
         socket.in(chatId).emit(ChatEventEnum.TYPING_EVENT, chatId);
     });
 };
@@ -42,7 +43,7 @@ const initializeSocketIO = (io: Server) => {
 
             if (!token) {
                 // If there is no access token in cookies. Check inside the handshake auth
-                token = socket.handshake.auth?.token;
+                token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWI1NWFmOTE1NDM0YmIxYWMyZGFlN2QiLCJlbWFpbCI6Im5ld0BnbWFpbC5jb20iLCJmdWxsTmFtZSI6Im5ldyIsImxvZ2luVHlwZSI6IkVNQUlMX1BBU1NXT1JEIiwiaXNFbWFpbFZlcmlmaWVkIjpmYWxzZSwiaXNBY3RpdmUiOmZhbHNlLCJjb252ZXJzYXRpb25JZCI6W10sIm1lc3NhZ2VJZCI6W10sImNyZWF0ZWRBdCI6IjIwMjQtMDEtMjdUMTk6MzU6MjEuNzI5WiIsInVwZGF0ZWRBdCI6IjIwMjQtMDEtMjlUMDQ6NDk6MDUuOTU1WiIsIl9fdiI6MCwiaWF0IjoxNzA2NTA5Njk1LCJleHAiOjE3MDY1OTYwOTV9.lwQc06mQlai6klLHLcBujADqoHkuGExG950FdBfgQnk';
             }
 
             if (!token) {
@@ -74,6 +75,7 @@ const initializeSocketIO = (io: Server) => {
             mountParticipantTypingEvent(socket);
             mountParticipantStoppedTypingEvent(socket);
 
+
             socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {
                 console.log("user has disconnected 🚫. userId: " + socket.user?._id);
                 if (socket.user?._id) {
@@ -90,7 +92,7 @@ const initializeSocketIO = (io: Server) => {
 };
 
 
-const emitSocketEvent = (req: Request, roomId: string, event: ChatEvent, payload: any) => {
+const emitSocketEvent = (req: Request, roomId: string, event: ChatEventEnum, payload: any) => {
     req.app.get("io").in(roomId).emit(event, payload);
 };
 

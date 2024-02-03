@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { upload } from "../middlewares/multer-middleware";
-import { getUser, handleSocialLogin, loginUser, registerUser, updateUser } from "../controllers/users/user-controller";
+import { getAllUsers, getUser, handleSocialLogin, loginUser, registerUser, updateUser } from "../controllers/users/user-controller";
 import { CreateUserJoiValidation, LoginUserJoiValidation, UpdateUserJoiValidation } from "../controllers/users/validation";
 import { verifyJWT } from "../middlewares/auth-middleware";
 import passport from "passport";
@@ -16,6 +16,11 @@ router.route('/register').post(
 router.route('/login').post(
     LoginUserJoiValidation,
     loginUser
+)
+
+router.route('/get-all-users').get(
+    verifyJWT,
+    getAllUsers
 )
 
 router.route('/:id').get(
@@ -38,7 +43,7 @@ router.route("/auth/google").get(
     }
 );
 
-router
-    .route("/auth/google/callback")
+router.route("/auth/google/callback")
     .get(passport.authenticate("google", { session: false }), handleSocialLogin);
+    
 export default router;

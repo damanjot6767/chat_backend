@@ -1,6 +1,6 @@
 import { ApiError } from "../../utils/api-error";
 import { UserModel } from "../../models/index";
-import { createUser, getUserByEmail, getUserById, getUserByLoginCredential, updateUserById } from "../../models/user.model";
+import { createUser, getUserByEmail, getUserById, getUserByLoginCredential, getUsers, updateUserById } from "../../models/user.model";
 import { CreateUserDto, CreateUserResponseDto } from "./dto/create-user-dto";
 import { LoginUserDto, LoginUserResponseDto, UpdateUserDto, UserResponseDto } from "./dto";
 
@@ -37,6 +37,11 @@ export const getUserService = async (
 ): Promise<LoginUserResponseDto> => {
 
     const user = await getUserById(id)
+    return user
+}
+export const getAllUsersService = async (): Promise<UserResponseDto[]> => {
+
+    const user = await getUsers()
     return user
 }
 

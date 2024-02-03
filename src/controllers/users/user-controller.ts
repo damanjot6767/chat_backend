@@ -1,7 +1,7 @@
 import { cookieOptions } from "../../constants";
 import { ApiResponse } from "../../utils/api-response";
 import { asyncHandler } from "../../utils/async-handler";
-import { getUserService, handleSocialLoginService, loginService, registerService, updateUserService } from "./user-service";
+import { getAllUsersService, getUserService, handleSocialLoginService, loginService, registerService, updateUserService } from "./user-service";
 
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -24,7 +24,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     return res.
         status(200).
-        cookie("accessToken", response.accessToken, cookieOptions).
+        cookie("accessToken", response.accessToken).
         json(
             new ApiResponse(
                 201, response, 'User login successfully'
@@ -59,6 +59,19 @@ const getUser = asyncHandler(async (req, res) => {
         )
 })
 
+const getAllUsers = asyncHandler(async (req, res) => {
+
+    const response = await getAllUsersService()
+
+    return res.
+        status(200).
+        json(
+            new ApiResponse(
+                201, response, 'User get successfully'
+            )
+        )
+})
+
 const updateUser = asyncHandler(async (req, res) => {
 
     const response = await updateUserService(req.params.id, req.body)
@@ -72,6 +85,4 @@ const updateUser = asyncHandler(async (req, res) => {
         )
 })
 
-
-
-export { registerUser, loginUser, getUser, updateUser, handleSocialLogin }
+export { registerUser, loginUser, getUser, updateUser, handleSocialLogin, getAllUsers }

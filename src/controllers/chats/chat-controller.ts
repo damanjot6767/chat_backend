@@ -1,4 +1,6 @@
 
+import { ChatEventEnum } from "../../constants";
+import { emitSocketEvent } from "../../socket";
 import { ApiResponse } from "../../utils/api-response";
 import { asyncHandler } from "../../utils/async-handler";
 import { createChatService, deleteChatService, getChatByUserIdService, getChatService, updateChatService } from "./chat-service";
@@ -7,7 +9,15 @@ import { createChatService, deleteChatService, getChatByUserIdService, getChatSe
 const createChat = asyncHandler(async (req, res) => {
 
     const response = await createChatService(req.user,req.body)
+    
+    response.userIds.forEach((user)=>{
 
+        if(user.userId!==req?.user._id){
+            emitSocketEvent(req,user.userId,ChatEventEnum.NEW_CHAT_EVENT,response)
+        }
+
+    })
+  
     return res.
         status(201).
         json(

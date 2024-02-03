@@ -1,5 +1,4 @@
-import { UserResponseDto } from '../controllers/users/dto/index';
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Response, NextFunction, RequestHandler } from 'express';
 
 
 const asyncHandler = (requestHandler: RequestHandler) => {

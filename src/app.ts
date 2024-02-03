@@ -43,12 +43,12 @@ app.use(logger('dev'));
 
 // required for passport
 
-app.use(passport.initialize());
+// app.use(passport.initialize());
 
 //-------------------Routes
-// app.use("/v1/user", userRouter);
-// app.use("/v1/chat/chats", chatRouter);
-app.use("/v1/message/messages", messageRouter);
+app.use("/v1/user", userRouter);
+app.use("/v1/chat", chatRouter);
+app.use("/v1/message", messageRouter);
 
 //-----------------Socket
 initializeSocketIO(io);
@@ -64,4 +64,4 @@ import { swaggerOptions } from "./constants";
 const specs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-export { app }
+export { httpServer }

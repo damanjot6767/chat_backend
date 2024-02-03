@@ -3,9 +3,18 @@ import { ApiError } from '../utils/api-error';
 import { asyncHandler } from '../utils/async-handler';
 import { getUserById } from '../models/user.model';
 import { UserResponseDto } from '../controllers/users/dto';
+import { User } from '../controllers/users/dto/user-dto';
+
+declare module 'express-serve-static-core'{ // handle req.user typescript error
+    interface Request {
+        user: User
+    }
+}
+
+
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
-    const token = req.cookies?.accessToken || req.header('Authorization')?.replace('Bearer', "");
+    const token = req.cookies?.accessToken || req.header('Authorization')?.split(' ')?.[1];
 
     if (!token) {
         throw new ApiError(401, 'Unauthorized request')

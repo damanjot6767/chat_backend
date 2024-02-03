@@ -5,7 +5,7 @@ import { createMessage, deleteMessage, updateMessage } from "../controllers/mess
 import { GetMessageByIdParamJoiValidation } from "../controllers/messages/validation/get-message-validation";
 
 
-const router = Router();
+const router = Router();;;
 
 router.route('/create').post(
     verifyJWT,

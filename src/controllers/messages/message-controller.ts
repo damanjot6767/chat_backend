@@ -1,4 +1,6 @@
 
+import { ChatEventEnum } from "../../constants";
+import { emitSocketEvent } from "../../socket";
 import { ApiResponse } from "../../utils/api-response";
 import { asyncHandler } from "../../utils/async-handler";
 import { createMessageService, deleteMessageService, updateMessageService } from "./message-service";
@@ -7,6 +9,14 @@ import { createMessageService, deleteMessageService, updateMessageService } from
 const createMessage = asyncHandler(async (req, res) => {
 
     const response = await createMessageService(req.user, req.body)
+
+    response.userIds.forEach((user)=>{
+
+        if(user.userId!==req?.user._id){
+            emitSocketEvent(req,user.userId,ChatEventEnum.MESSAGE_RECEIVED_EVENT,response)
+        }
+
+    })
 
     return res.
         status(201).
