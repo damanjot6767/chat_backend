@@ -1,6 +1,6 @@
 import { ApiError } from "../../utils/api-error";
 import { UserModel } from "../../models/index";
-import { createUser, getUserByEmail, getUserById, getUserByLoginCredential, getUsers, updateUserById } from "../../models/user.model";
+import { changePassword, createUser, getUserByEmail, getUserById, getUserByLoginCredential, getUsers, updateUserById } from "../../models/user.model";
 import { CreateUserDto, CreateUserResponseDto } from "./dto/create-user-dto";
 import { LoginUserDto, LoginUserResponseDto, UpdateUserDto, UserResponseDto } from "./dto";
 
@@ -89,3 +89,32 @@ const generateAccessAndRefereshTokens = async (userId: string) => {
     }
 }
 
+export const generateTempraryToken = async (userId: string) => {
+    try {
+        const user = await UserModel.findById(userId)
+        const token = user.generateTempraryToken(user)
+
+        return { token }
+
+
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while generating mail token")
+    }
+}
+
+export const changePasswordService = async (
+    id: string,
+    password: string
+): Promise<LoginUserResponseDto> => {
+
+    const user = await changePassword(id, password)
+    return user
+}
+
+export const getUserByEmailService = async (
+    email: string
+): Promise<UserResponseDto> => {
+
+    const user = await getUserByEmail(email)
+    return user
+}

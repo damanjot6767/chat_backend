@@ -1,5 +1,4 @@
 import express from "express";
-import session from "express-session";
 import { createServer } from 'http';
 import fs from "fs";
 import path from "path";
@@ -11,7 +10,6 @@ import logger from 'morgan'
 import { initializeSocketIO } from "./socket/index";
 import { Server } from "socket.io";
 import { chatRouter, messageRouter, userRouter } from "./routes";
-
 
 const app = express();
 
@@ -35,7 +33,9 @@ app.use(cors({
 
 app.use(express.json({ limit: '20kb' }));
 app.use(express.urlencoded({ extended: true, limit: '20kb' }));
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, '../public')));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 app.use(cookieParser());
 app.use(compression());
 app.use(logger('dev'));

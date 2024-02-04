@@ -4,6 +4,7 @@ import { UserLoginType } from "../../../constants";
 interface User {
   _id: string;
   email: string;
+  isEmailVerified: boolean;
   fullName: string;
   avatar?: string; // cloudinary url
   coverImage?: string; // cloudinary url

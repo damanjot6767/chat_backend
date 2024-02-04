@@ -1,21 +1,25 @@
 import { cookieOptions } from "../../constants";
 import { ApiResponse } from "../../utils/api-response";
 import { asyncHandler } from "../../utils/async-handler";
-import { getAllUsersService, getUserService, handleSocialLoginService, loginService, registerService, updateUserService } from "./user-service";
+import { ForgetPasswordMailOptions, RegisterMailOptions, SendMail } from "../../utils/mail";
+import { generateTempraryToken, getAllUsersService, getUserService, handleSocialLoginService, loginService, registerService, updateUserService, changePasswordService, getUserByEmailService } from "./user-service";
 
 
 const registerUser = asyncHandler(async (req, res) => {
 
     const response = await registerService(req.body)
 
-    return res.
+    const { token } = await generateTempraryToken(response._id)
+
+    res.
         status(201).
         cookie("accessToken", response.accessToken, cookieOptions).
         json(
             new ApiResponse(
-                201, response, 'User created successfully'
+                201, response, 'We sent a link to your email please click on to verify your mail'
             )
         )
+    SendMail(await RegisterMailOptions(response, token))
 })
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -85,4 +89,82 @@ const updateUser = asyncHandler(async (req, res) => {
         )
 })
 
-export { registerUser, loginUser, getUser, updateUser, handleSocialLogin, getAllUsers }
+const confirmMail = asyncHandler(async (req, res) => {
+
+    const response = await updateUserService(req.user?._id, { isEmailVerified: true })
+
+    res.render(
+        'mail-confirmation-success',
+        {
+            userEmail: response.email,
+            userName: response.fullName,
+            link: process.env.FRONTEND_REDIRECT_URL
+        });
+})
+
+const forgetPassword = asyncHandler(async (req, res) => {
+
+    const user = await getUserByEmailService(req.body.email)
+
+    res.
+        status(201).
+        json(
+            new ApiResponse(
+                201, user, 'We sent forget password link please click on that link.'
+            )
+        )
+
+    if (user) {
+        const { token } = await generateTempraryToken(user._id)
+        SendMail(ForgetPasswordMailOptions(user, token))
+    }
+
+})
+
+const forgetPasswordVerify = asyncHandler(async (req, res) => {
+
+    res.render('forget-password', { userEmail: req.user.email, userId: req.user._id });
+})
+
+const changeForgetPassword = asyncHandler(async (req, res) => {
+
+    const response = await changePasswordService(req.body?.userId, req.body?.newPassword)
+    // await SendMail(RegisterMailOptions([response.email], mailConfirmationToken))
+
+    return res.
+        status(201).
+        json(
+            new ApiResponse(
+                201, response, 'password changed successfully'
+            )
+        )
+
+})
+
+const changePasswordSuccess = asyncHandler(async (req, res) => {
+
+    res.render(
+        'password-change-success',
+        {
+            userEmail: req.query?.email,
+            redirectUrl:
+                process.env.FRONTEND_REDIRECT_URL
+        }
+    )
+
+})
+
+
+export {
+    registerUser,
+    loginUser,
+    getUser,
+    updateUser,
+    handleSocialLogin,
+    getAllUsers,
+    confirmMail,
+    forgetPassword,
+    forgetPasswordVerify,
+    changeForgetPassword,
+    changePasswordSuccess
+}

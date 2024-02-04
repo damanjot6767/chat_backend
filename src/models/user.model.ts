@@ -115,6 +115,17 @@ userSchema.methods.generateRefreshToken = function () {
         }
     )
 }
+userSchema.methods.generateTempraryToken = function () {
+    return jwt.sign(
+        {
+            ...this._doc
+        },
+        process.env.TEMPRARY_TOKEN_SECRET,
+        {
+            expiresIn: process.env.TEMPRARY_TOKEN_EXPIRY
+        }
+    )
+}
 
 export const UserModel = mongoose.model('User', userSchema);
 
@@ -152,4 +163,13 @@ export const createUser = <UserPayload>(values: UserPayload): Promise<CreateUser
 export const deleteUserById = (id: string): any => UserModel.findOneAndDelete({ _id: id });
 export const updateUserById = <UserPayload>(id: string, values: UserPayload): Promise<CreateUserResponseDto> => UserModel.findByIdAndUpdate(id, values, { new: true });
 
+export const changePassword = async (userId: string, newPassword: string): Promise<UserResponseDto> => {
+    try {
 
+        newPassword = await bcrypt.hash(newPassword, 10)
+        const user = await UserModel.findByIdAndUpdate(userId, { password: newPassword }, { new: true })
+        return user
+    } catch (error) {
+        throw new ApiError(400, error.message)
+    }
+}

@@ -4,7 +4,9 @@ interface UpdateUserResponseDto extends User {
 }
 
 interface UpdateUserDto {
-    fullName: string,
+    fullName?: string,
+    isEmailVerified?: boolean,
+    password?: string
 }
 
 export { UpdateUserResponseDto, UpdateUserDto }
