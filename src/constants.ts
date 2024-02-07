@@ -26,6 +26,8 @@ export enum ChatEventEnum {
 
 
 export const cookieOptions = {
+  domain:'localhost',
+  path:'/',
   httpOnly: true,
   secure: false, // Adjust this based on your environment (e.g., use `true` in production with HTTPS)
 };

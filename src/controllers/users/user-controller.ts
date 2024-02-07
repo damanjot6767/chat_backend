@@ -2,6 +2,7 @@ import { cookieOptions } from "../../constants";
 import { ApiResponse } from "../../utils/api-response";
 import { asyncHandler } from "../../utils/async-handler";
 import { ForgetPasswordMailOptions, RegisterMailOptions, SendMail } from "../../utils/mail";
+import { User } from "./dto/user-dto";
 import { generateTempraryToken, getAllUsersService, getUserService, handleSocialLoginService, loginService, registerService, updateUserService, changePasswordService, getUserByEmailService } from "./user-service";
 
 
@@ -52,7 +53,7 @@ const handleSocialLogin = asyncHandler(async (req: any, res) => {
 
 const getUser = asyncHandler(async (req, res) => {
 
-    const response = await getUserService(req.params.id)
+    const response = await getUserService(req.user._id || req.params?.id)
 
     return res.
         status(200).
@@ -91,15 +92,29 @@ const updateUser = asyncHandler(async (req, res) => {
 
 const confirmMail = asyncHandler(async (req, res) => {
 
-    const response = await updateUserService(req.user?._id, { isEmailVerified: true })
+    let response: User;
+    response = await getUserService(req.user?._id);
 
+    if(response.isEmailVerified) {
+        res.render(
+            'mail-already-confirmed',
+            {
+                userEmail: response.email,
+                userName: response.fullName,
+                link: process.env.FRONTEND_REDIRECT_URL
+            });
+        return;
+    }
+
+    response = await updateUserService(req.user?._id, { isEmailVerified: true })
     res.render(
         'mail-confirmation-success',
         {
             userEmail: response.email,
             userName: response.fullName,
             link: process.env.FRONTEND_REDIRECT_URL
-        });
+        }
+    );
 })
 
 const forgetPassword = asyncHandler(async (req, res) => {
@@ -121,14 +136,9 @@ const forgetPassword = asyncHandler(async (req, res) => {
 
 })
 
-const forgetPasswordVerify = asyncHandler(async (req, res) => {
-
-    res.render('forget-password', { userEmail: req.user.email, userId: req.user._id });
-})
-
 const changeForgetPassword = asyncHandler(async (req, res) => {
 
-    const response = await changePasswordService(req.body?.userId, req.body?.newPassword)
+    const response = await changePasswordService(req.user?._id, req.body?.new_password)
     // await SendMail(RegisterMailOptions([response.email], mailConfirmationToken))
 
     return res.
@@ -141,19 +151,20 @@ const changeForgetPassword = asyncHandler(async (req, res) => {
 
 })
 
-const changePasswordSuccess = asyncHandler(async (req, res) => {
+const verifyEmail = asyncHandler(async (req, res) => {
 
-    res.render(
-        'password-change-success',
-        {
-            userEmail: req.query?.email,
-            redirectUrl:
-                process.env.FRONTEND_REDIRECT_URL
-        }
+    const { token } = await generateTempraryToken(req.user._id)
+
+    res.
+    status(201).
+    json(
+        new ApiResponse(
+            201, null, 'We sent a link to your email please click on to verify your mail'
+        )
     )
+    SendMail(await RegisterMailOptions(req.user, token))
 
 })
-
 
 export {
     registerUser,
@@ -164,7 +175,6 @@ export {
     getAllUsers,
     confirmMail,
     forgetPassword,
-    forgetPasswordVerify,
     changeForgetPassword,
-    changePasswordSuccess
+    verifyEmail
 }

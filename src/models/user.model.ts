@@ -148,10 +148,10 @@ export const getUserByLoginCredential = async (email: string, password: string):
 }
 export const getUserById = async (id: string): Promise<UserResponseDto> => {
     try {
-        const user: CreateUserResponseDto = await UserModel.findOne({ _id: id })
+        const user = await UserModel.findOne({ _id: id })
 
         if (user) {
-            return user
+            return user._doc
         }
 
         throw new ApiError(401, 'User not found')

@@ -9,5 +9,5 @@ interface CreateUserDto {
     password: string
 }
 
-export { CreateUserResponseDto, CreateUserDto }
+export { CreateUserResponseDto, CreateUserDto };;;
 

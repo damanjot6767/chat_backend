@@ -1,12 +1,12 @@
-import { CreateChatResponseDto, CreateChatDto } from './create-message-dto'
-import { UpdateChatResponseDto, UpdateChatDto } from './update-message-dto'
-import { ChatResponseDto } from './message-dto'
+import { CreateMessageResponseDto, CreateMessageDto } from './create-message-dto'
+import { UpdateMessageResponseDto, UpdateMessageDto } from './update-message-dto'
+import { MessageResponseDto } from './message-dto'
 
 
 export {
-    CreateChatDto,
-    CreateChatResponseDto,
-    ChatResponseDto,
-    UpdateChatResponseDto,
-    UpdateChatDto
+    CreateMessageDto,
+    CreateMessageResponseDto,
+    MessageResponseDto,
+    UpdateMessageResponseDto,
+    UpdateMessageDto
 }

@@ -28,7 +28,7 @@ export async function SendMail(mailOptions) {
 
 
 export const RegisterMailOptions = async (user:User, confirmationToken: string) => {
-    const confirmationLink = `http://localhost:8000/v1/user/confirm-mail?token=${confirmationToken}`;
+    const confirmationLink = `https://chat-2tir.onrender.com/v1/user/confirm-mail?token=${confirmationToken}`;
 
     try {
         // Use util.promisify to convert ejs.renderFile to a promise-based function
@@ -76,7 +76,7 @@ export const RegisterMailOptions = async (user:User, confirmationToken: string) 
 
 export const ForgetPasswordMailOptions = (user: User, confirmationToken: string) => {
 
-    const confirmationLink = `http://localhost:8000/v1/user/forget-password?token=${confirmationToken}`
+    const confirmationLink = `https://chat-grydokno7-damanjot6767.vercel.app/newPassword?token=${confirmationToken}`
 
     return {
         from: {

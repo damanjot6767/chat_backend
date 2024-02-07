@@ -1,4 +1,3 @@
-import { ChatType } from "../../../constants";
 import { Chat } from "../../chats/dto/chat-dto";
 import { User } from "../../users/dto/user-dto";
 

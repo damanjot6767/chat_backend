@@ -22,13 +22,14 @@ const mountJoinChatEvent = (socket: SocketWithUser) => {
 
 const mountParticipantTypingEvent = (socket: SocketWithUser) => {
     socket.on(ChatEventEnum.TYPING_EVENT, (chatId: any) => {
-        console.log('5')
+        console.log(ChatEventEnum.TYPING_EVENT)
         socket.in(chatId).emit(ChatEventEnum.TYPING_EVENT, chatId);
     });
 };
 
 const mountParticipantStoppedTypingEvent = (socket: SocketWithUser) => {
     socket.on(ChatEventEnum.STOP_TYPING_EVENT, (chatId: string) => {
+        console.log(ChatEventEnum.STOP_TYPING_EVENT)
         socket.in(chatId).emit(ChatEventEnum.STOP_TYPING_EVENT, chatId);
     });
 };
@@ -43,7 +44,7 @@ const initializeSocketIO = (io: Server) => {
 
             if (!token) {
                 // If there is no access token in cookies. Check inside the handshake auth
-                token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWI1NWFmOTE1NDM0YmIxYWMyZGFlN2QiLCJlbWFpbCI6Im5ld0BnbWFpbC5jb20iLCJmdWxsTmFtZSI6Im5ldyIsImxvZ2luVHlwZSI6IkVNQUlMX1BBU1NXT1JEIiwiaXNFbWFpbFZlcmlmaWVkIjpmYWxzZSwiaXNBY3RpdmUiOmZhbHNlLCJjb252ZXJzYXRpb25JZCI6W10sIm1lc3NhZ2VJZCI6W10sImNyZWF0ZWRBdCI6IjIwMjQtMDEtMjdUMTk6MzU6MjEuNzI5WiIsInVwZGF0ZWRBdCI6IjIwMjQtMDEtMjlUMDQ6NDk6MDUuOTU1WiIsIl9fdiI6MCwiaWF0IjoxNzA2NTA5Njk1LCJleHAiOjE3MDY1OTYwOTV9.lwQc06mQlai6klLHLcBujADqoHkuGExG950FdBfgQnk';
+                token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWJjOWQ0NmJiNmFiZjZiYTM0MWRiM2YiLCJlbWFpbCI6InZuYXZlZW4wQGdtYWlsLmNvbSIsImZ1bGxOYW1lIjoibmV3dXNlciIsImxvZ2luVHlwZSI6IkVNQUlMX1BBU1NXT1JEIiwiaXNFbWFpbFZlcmlmaWVkIjpmYWxzZSwiaXNBY3RpdmUiOmZhbHNlLCJjb252ZXJzYXRpb25JZCI6W10sIm1lc3NhZ2VJZCI6W10sImNyZWF0ZWRBdCI6IjIwMjQtMDItMDJUMDc6NDQ6MDYuMjQ0WiIsInVwZGF0ZWRBdCI6IjIwMjQtMDItMDZUMTI6MjQ6MDUuOTc5WiIsIl9fdiI6MCwiaWF0IjoxNzA3MjIyNzQ0LCJleHAiOjE3MDczMDkxNDR9.GfQEWOuy0wyggkE0d9iYkpZKRZmlr7WZoL14TJ1ep94';
             }
 
             if (!token) {

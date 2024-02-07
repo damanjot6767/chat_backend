@@ -1,4 +1,3 @@
-import { Chat } from "../../chats/dto/chat-dto";
 import { Message } from "./message-dto"
 
 interface CreateMessageResponseDto extends Message {
