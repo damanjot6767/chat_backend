@@ -27,7 +27,7 @@ app.set("io", io); // using set method to mount the `io` instance on the app to 
 
 console.log('28',process.env.CORS_ORIGIN)
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: 'https://chat-grydokno7-damanjot6767.vercel.app',
     credentials: true
 }));
 
