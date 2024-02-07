@@ -76,7 +76,7 @@ export const RegisterMailOptions = async (user:User, confirmationToken: string) 
 
 export const ForgetPasswordMailOptions = (user: User, confirmationToken: string) => {
 
-    const confirmationLink = `${process.env.CORS_ORIGIN}/newPassword?token=${confirmationToken}`
+    const confirmationLink = `https://chat-h247xktsc-damanjot6767.vercel.app//newPassword?token=${confirmationToken}`
 
     return {
         from: {
