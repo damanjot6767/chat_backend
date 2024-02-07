@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changePasswordSuccess = exports.changeForgetPassword = exports.forgetPasswordVerify = exports.forgetPassword = exports.confirmMail = exports.getAllUsers = exports.handleSocialLogin = exports.updateUser = exports.getUser = exports.loginUser = exports.registerUser = void 0;
+exports.verifyEmail = exports.changeForgetPassword = exports.forgetPassword = exports.confirmMail = exports.getAllUsers = exports.handleSocialLogin = exports.updateUser = exports.getUser = exports.loginUser = exports.registerUser = void 0;
 const constants_1 = require("../../constants");
 const api_response_1 = require("../../utils/api-response");
 const async_handler_1 = require("../../utils/async-handler");
@@ -43,7 +43,8 @@ const handleSocialLogin = (0, async_handler_1.asyncHandler)((req, res) => __awai
 }));
 exports.handleSocialLogin = handleSocialLogin;
 const getUser = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield (0, user_service_1.getUserService)(req.params.id);
+    var _b;
+    const response = yield (0, user_service_1.getUserService)(req.user._id || ((_b = req.params) === null || _b === void 0 ? void 0 : _b.id));
     return res.
         status(200).
         json(new api_response_1.ApiResponse(201, response, 'User get successfully'));
@@ -64,8 +65,18 @@ const updateUser = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(voi
 }));
 exports.updateUser = updateUser;
 const confirmMail = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const response = yield (0, user_service_1.updateUserService)((_b = req.user) === null || _b === void 0 ? void 0 : _b._id, { isEmailVerified: true });
+    var _c, _d;
+    let response;
+    response = yield (0, user_service_1.getUserService)((_c = req.user) === null || _c === void 0 ? void 0 : _c._id);
+    if (response.isEmailVerified) {
+        res.render('mail-already-confirmed', {
+            userEmail: response.email,
+            userName: response.fullName,
+            link: process.env.FRONTEND_REDIRECT_URL
+        });
+        return;
+    }
+    response = yield (0, user_service_1.updateUserService)((_d = req.user) === null || _d === void 0 ? void 0 : _d._id, { isEmailVerified: true });
     res.render('mail-confirmation-success', {
         userEmail: response.email,
         userName: response.fullName,
@@ -84,24 +95,20 @@ const forgetPassword = (0, async_handler_1.asyncHandler)((req, res) => __awaiter
     }
 }));
 exports.forgetPassword = forgetPassword;
-const forgetPasswordVerify = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.render('forget-password', { userEmail: req.user.email, userId: req.user._id });
-}));
-exports.forgetPasswordVerify = forgetPasswordVerify;
 const changeForgetPassword = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c, _d;
-    const response = yield (0, user_service_1.changePasswordService)((_c = req.body) === null || _c === void 0 ? void 0 : _c.userId, (_d = req.body) === null || _d === void 0 ? void 0 : _d.newPassword);
+    var _e, _f;
+    const response = yield (0, user_service_1.changePasswordService)((_e = req.user) === null || _e === void 0 ? void 0 : _e._id, (_f = req.body) === null || _f === void 0 ? void 0 : _f.new_password);
     // await SendMail(RegisterMailOptions([response.email], mailConfirmationToken))
     return res.
         status(201).
         json(new api_response_1.ApiResponse(201, response, 'password changed successfully'));
 }));
 exports.changeForgetPassword = changeForgetPassword;
-const changePasswordSuccess = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _e;
-    res.render('password-change-success', {
-        userEmail: (_e = req.query) === null || _e === void 0 ? void 0 : _e.email,
-        redirectUrl: process.env.FRONTEND_REDIRECT_URL
-    });
+const verifyEmail = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { token } = yield (0, user_service_1.generateTempraryToken)(req.user._id);
+    res.
+        status(201).
+        json(new api_response_1.ApiResponse(201, null, 'We sent a link to your email please click on to verify your mail'));
+    (0, mail_1.SendMail)(yield (0, mail_1.RegisterMailOptions)(req.user, token));
 }));
-exports.changePasswordSuccess = changePasswordSuccess;
+exports.verifyEmail = verifyEmail;

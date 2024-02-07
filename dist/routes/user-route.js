@@ -14,9 +14,8 @@ router.route('/login').post(validation_1.LoginUserJoiValidation, user_controller
 router.route('/get-all-users').get(auth_middleware_1.verifyJWT, user_controller_1.getAllUsers);
 router.route('/confirm-mail').get(auth_middleware_1.verifyMailJWT, user_controller_1.confirmMail);
 router.route('/forget-password').post(user_controller_1.forgetPassword);
-router.route('/forget-password').get(auth_middleware_1.verifyMailJWT, user_controller_1.forgetPasswordVerify);
-router.route('/change-password').post(user_controller_1.changeForgetPassword);
-router.route('/change-password').get(user_controller_1.changePasswordSuccess);
+router.route('/change-password').post(auth_middleware_1.verifyMailJWT, user_controller_1.changeForgetPassword);
+router.route('/verify-email').get(auth_middleware_1.verifyJWT, user_controller_1.verifyEmail);
 router.route('/:id').get(auth_middleware_1.verifyJWT, user_controller_1.getUser);
 router.route('/update/:id').post(auth_middleware_1.verifyJWT, validation_1.UpdateUserJoiValidation, user_controller_1.updateUser);
 router.route("/auth/google").get(passport_1.default.authenticate("google", {

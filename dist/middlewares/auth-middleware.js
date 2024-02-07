@@ -25,27 +25,21 @@ const verifyJWT = (0, async_handler_1.asyncHandler)((req, res, next) => __awaite
     }
     const decodeToken = jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_SECRET);
     const user = yield (0, user_model_1.getUserById)(decodeToken === null || decodeToken === void 0 ? void 0 : decodeToken._id);
-    req.user = user._doc;
+    // if(user?.isEmailVerified === false){
+    //     throw new ApiError(400, 'Please verify your mail first')
+    //  }
+    req.user = user;
     next();
 }));
 exports.verifyJWT = verifyJWT;
-const verifyMailJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const token = req.query.token;
-        if (!token) {
-            throw new api_error_1.ApiError(401, 'Unauthorized request');
-        }
-        const decodeToken = jsonwebtoken_1.default.verify(token, process.env.TEMPRARY_TOKEN_SECRET);
-        const user = yield (0, user_model_1.getUserById)(decodeToken === null || decodeToken === void 0 ? void 0 : decodeToken._id);
-        req.user = user._doc;
-        next();
+const verifyMailJWT = (0, async_handler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.query.token;
+    if (!token) {
+        throw new api_error_1.ApiError(401, 'Unauthorized request');
     }
-    catch (error) {
-        res.render('mail-confirmation-expired', {
-            error: error.message === 'jwt expired'
-                ? 'Token Expired' :
-                error.message
-        });
-    }
-});
+    const decodeToken = jsonwebtoken_1.default.verify(token, process.env.TEMPRARY_TOKEN_SECRET);
+    const user = yield (0, user_model_1.getUserById)(decodeToken === null || decodeToken === void 0 ? void 0 : decodeToken._id);
+    req.user = user;
+    next();
+}));
 exports.verifyMailJWT = verifyMailJWT;

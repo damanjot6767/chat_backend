@@ -40,7 +40,7 @@ function SendMail(mailOptions) {
 }
 exports.SendMail = SendMail;
 const RegisterMailOptions = (user, confirmationToken) => __awaiter(void 0, void 0, void 0, function* () {
-    const confirmationLink = `http://localhost:8000/v1/user/confirm-mail?token=${confirmationToken}`;
+    const confirmationLink = `https://chat-2tir.onrender.com/v1/user/confirm-mail?token=${confirmationToken}`;
     try {
         // Use util.promisify to convert ejs.renderFile to a promise-based function
         const renderFileAsync = require('util').promisify(ejs_1.default.renderFile);
@@ -79,14 +79,14 @@ const RegisterMailOptions = (user, confirmationToken) => __awaiter(void 0, void 
 });
 exports.RegisterMailOptions = RegisterMailOptions;
 const ForgetPasswordMailOptions = (user, confirmationToken) => {
-    const confirmationLink = `http://localhost:8000/v1/user/forget-password?token=${confirmationToken}`;
+    const confirmationLink = `https://chat-grydokno7-damanjot6767.vercel.app/newPassword?token=${confirmationToken}`;
     return {
         from: {
             name: 'Free Chat',
             address: process.env.NODEMAIL_USER
         },
-        to: user.email, // list of receivers
-        subject: "Forget password to Free chat", // Subject line
+        to: user.email,
+        subject: "Forget password to Free chat",
         html: `
         <p>Hello,</p>
         <p>Click the following link to forget your password:</p>

@@ -29,12 +29,13 @@ const mountJoinChatEvent = (socket) => {
 };
 const mountParticipantTypingEvent = (socket) => {
     socket.on(constants_1.ChatEventEnum.TYPING_EVENT, (chatId) => {
-        console.log('5');
+        console.log(constants_1.ChatEventEnum.TYPING_EVENT);
         socket.in(chatId).emit(constants_1.ChatEventEnum.TYPING_EVENT, chatId);
     });
 };
 const mountParticipantStoppedTypingEvent = (socket) => {
     socket.on(constants_1.ChatEventEnum.STOP_TYPING_EVENT, (chatId) => {
+        console.log(constants_1.ChatEventEnum.STOP_TYPING_EVENT);
         socket.in(chatId).emit(constants_1.ChatEventEnum.STOP_TYPING_EVENT, chatId);
     });
 };
@@ -47,7 +48,7 @@ const initializeSocketIO = (io) => {
             let token = cookies === null || cookies === void 0 ? void 0 : cookies.accessToken; // get the accessToken
             if (!token) {
                 // If there is no access token in cookies. Check inside the handshake auth
-                token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWI1NWFmOTE1NDM0YmIxYWMyZGFlN2QiLCJlbWFpbCI6Im5ld0BnbWFpbC5jb20iLCJmdWxsTmFtZSI6Im5ldyIsImxvZ2luVHlwZSI6IkVNQUlMX1BBU1NXT1JEIiwiaXNFbWFpbFZlcmlmaWVkIjpmYWxzZSwiaXNBY3RpdmUiOmZhbHNlLCJjb252ZXJzYXRpb25JZCI6W10sIm1lc3NhZ2VJZCI6W10sImNyZWF0ZWRBdCI6IjIwMjQtMDEtMjdUMTk6MzU6MjEuNzI5WiIsInVwZGF0ZWRBdCI6IjIwMjQtMDEtMjlUMDQ6NDk6MDUuOTU1WiIsIl9fdiI6MCwiaWF0IjoxNzA2NTA5Njk1LCJleHAiOjE3MDY1OTYwOTV9.lwQc06mQlai6klLHLcBujADqoHkuGExG950FdBfgQnk';
+                token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWJjOWQ0NmJiNmFiZjZiYTM0MWRiM2YiLCJlbWFpbCI6InZuYXZlZW4wQGdtYWlsLmNvbSIsImZ1bGxOYW1lIjoibmV3dXNlciIsImxvZ2luVHlwZSI6IkVNQUlMX1BBU1NXT1JEIiwiaXNFbWFpbFZlcmlmaWVkIjpmYWxzZSwiaXNBY3RpdmUiOmZhbHNlLCJjb252ZXJzYXRpb25JZCI6W10sIm1lc3NhZ2VJZCI6W10sImNyZWF0ZWRBdCI6IjIwMjQtMDItMDJUMDc6NDQ6MDYuMjQ0WiIsInVwZGF0ZWRBdCI6IjIwMjQtMDItMDZUMTI6MjQ6MDUuOTc5WiIsIl9fdiI6MCwiaWF0IjoxNzA3MjIyNzQ0LCJleHAiOjE3MDczMDkxNDR9.GfQEWOuy0wyggkE0d9iYkpZKRZmlr7WZoL14TJ1ep94';
             }
             if (!token) {
                 // Token is required for the socket to work
