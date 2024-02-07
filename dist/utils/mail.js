@@ -79,7 +79,7 @@ const RegisterMailOptions = (user, confirmationToken) => __awaiter(void 0, void 
 });
 exports.RegisterMailOptions = RegisterMailOptions;
 const ForgetPasswordMailOptions = (user, confirmationToken) => {
-    const confirmationLink = `https://chat-grydokno7-damanjot6767.vercel.app/newPassword?token=${confirmationToken}`;
+    const confirmationLink = `https://chat-h247xktsc-damanjot6767.vercel.app//newPassword?token=${confirmationToken}`;
     return {
         from: {
             name: 'Free Chat',
