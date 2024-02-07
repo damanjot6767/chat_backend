@@ -25,9 +25,9 @@ const io = new Server(httpServer, {
 
 app.set("io", io); // using set method to mount the `io` instance on the app to avoid usage of `global`
 
-console.log('28',process.env.CORS_ORIGIN)
+
 app.use(cors({
-    origin: 'https://chat-grydokno7-damanjot6767.vercel.app',
+    origin: process.env.CORS_ORIGIN,
     credentials: true
 }));
 
