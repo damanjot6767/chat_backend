@@ -22,7 +22,15 @@ export enum ChatEventEnum {
   TYPING_EVENT= "typing"
 } 
 
-
+export const FrontendRoutes = {
+  Signup: '/signup',
+  Login: '/login',
+  ForgetPassword: '/forgetPassword',
+  NewPassword: '/newPassword',
+  VerifyEmail: '/verifyEmail',
+  Users: '/users',
+  Conversations: '/conversations'
+}
 
 
 export const cookieOptions = {

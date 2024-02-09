@@ -4,6 +4,7 @@ import nodemailer from "nodemailer";
 import ejs from 'ejs';
 import path from 'path';
 import { User } from "../controllers/users/dto/user-dto";
+import { FrontendRoutes } from "../constants";
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -76,7 +77,7 @@ export const RegisterMailOptions = async (user:User, confirmationToken: string) 
 
 export const ForgetPasswordMailOptions = (user: User, confirmationToken: string) => {
 
-    const confirmationLink = `https://chat-5jz7v114p-damanjot6767.vercel.app/newPassword?token=${confirmationToken}`
+    const confirmationLink = `${process.env.FRONTEND_REDIRECT_URL+FrontendRoutes.NewPassword}?token=${confirmationToken}`
 
     return {
         from: {

@@ -1,4 +1,4 @@
-import { cookieOptions } from "../../constants";
+import { FrontendRoutes, cookieOptions } from "../../constants";
 import { ApiResponse } from "../../utils/api-response";
 import { asyncHandler } from "../../utils/async-handler";
 import { ForgetPasswordMailOptions, RegisterMailOptions, SendMail } from "../../utils/mail";
@@ -101,7 +101,7 @@ const confirmMail = asyncHandler(async (req, res) => {
             {
                 userEmail: response.email,
                 userName: response.fullName,
-                link: process.env.FRONTEND_REDIRECT_URL
+                link: process.env.FRONTEND_REDIRECT_URL+FrontendRoutes.Users
             });
         return;
     }
@@ -112,7 +112,7 @@ const confirmMail = asyncHandler(async (req, res) => {
         {
             userEmail: response.email,
             userName: response.fullName,
-            link: process.env.FRONTEND_REDIRECT_URL
+            link: process.env.FRONTEND_REDIRECT_URL+FrontendRoutes.Users
         }
     );
 })
