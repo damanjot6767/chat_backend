@@ -3,7 +3,6 @@ import { UpdateChatDto, ChatResponseDto, CreateChatResponseDto, CreateChatDto } 
 import { createChat, deleteChatById, getChatById, getChatByUserIds, getChatsByUserId, updateChatById } from "../../models/chat.model";
 import { User } from "../users/dto/user-dto";
 import { getUserById } from "../../models/user.model";
-import { ApiResponse } from "../../utils/api-response";
 
 export const createChatService = async (
     user,
@@ -25,7 +24,8 @@ export const createChatService = async (
 
     const chat = await getChatByUserIds(createChatDto.userIds)
     if (chat) {
-        throw new ApiResponse( 201, chat, 'Chat already created');
+        chat['message'] = 'Chat already created'
+        return chat
     }
 
     createChatDto.userIds = userIds;

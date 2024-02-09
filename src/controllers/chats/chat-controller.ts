@@ -9,22 +9,35 @@ import { createChatService, deleteChatService, getChatByUserIdService, getChatSe
 const createChat = asyncHandler(async (req, res) => {
 
     const response = await createChatService(req.user,req.body)
-    
-    response.userIds.forEach((user)=>{
 
-        if(user.userId!==req?.user._id){
-            emitSocketEvent(req,user.userId.toString(),ChatEventEnum.NEW_CHAT_EVENT,response)
-        }
+    if(response['message']){
+        delete response['message'];
 
-    })
+        return res.
+        status(201).
+        json(
+            new ApiResponse(
+                201, response, 'Chat already created'
+            )
+        )
+
+    }
   
-    return res.
+       res.
         status(201).
         json(
             new ApiResponse(
                 201, response, 'Chat created successfully'
             )
         )
+
+        response.userIds.forEach((user)=>{
+
+            if(user.userId!==req?.user._id){
+                emitSocketEvent(req,user.userId.toString(),ChatEventEnum.NEW_CHAT_EVENT,response)
+            }
+    
+        })
 })
 
 
