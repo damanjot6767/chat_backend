@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -45,7 +49,7 @@ const GetChatParamJoiValidation = (0, async_handler_1.asyncHandler)((req, res, n
 exports.GetChatParamJoiValidation = GetChatParamJoiValidation;
 const GetChatByUserIdParamJoiValidation = (0, async_handler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const chatParam = Joi.object({
-        userId: Joi.string().required()
+        userId: Joi.string().optional()
     });
     const { error, value } = chatParam.validate(req.params);
     if (error) {

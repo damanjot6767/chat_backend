@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -41,6 +45,10 @@ exports.chatSchema = new mongoose_1.Schema({
         enum: Object.values(constants_1.ChatType),
         default: constants_1.ChatType.INDIVIDUAL
     },
+    createdBy: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Users"
+    },
     userIds: [
         {
             isChatDelete: {
@@ -61,83 +69,79 @@ exports.chatSchema = new mongoose_1.Schema({
     ],
     latestMessage: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "Messages"
+        ref: "Messages",
+        default: null
     }
 }, {
     timestamps: true
 });
 exports.ChatModel = mongoose_1.default.model('Chat', exports.chatSchema);
 // Chat Services
-const getChatsByUserId = (userId, page = 1, limit = 10) => exports.ChatModel.aggregate([
-    {
-        $match: {
-            userIds: {
-                $elemMatch: { $eq: new mongoose_1.default.Types.ObjectId(userId) }
+const getChatsByUserId = (userId, page = 1, limit = 10) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const chat = yield exports.ChatModel.aggregate([
+            {
+                $match: {
+                    userIds: {
+                        $elemMatch: { userId: new mongoose_1.default.Types.ObjectId(userId) }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    let: {
+                        userId: "$userIds.userId"
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: [
+                                        "$_id",
+                                        "$$userId"
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: "users"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'messages',
+                    let: {
+                        messageIds: "$messageIds"
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: [
+                                        "$_id",
+                                        "$$messageIds"
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: "messages"
+                }
+            },
+            {
+                $project: {
+                    "users.password": 0,
+                    "users.refreshToken": 0
+                }
             }
-        }
-    },
-    {
-        $lookup: {
-            from: 'users',
-            let: {
-                userId: "$userIds.userId"
-            },
-            pipeline: [
-                {
-                    $match: {
-                        $expr: {
-                            $in: [
-                                "$_id",
-                                "$$userId"
-                            ]
-                        }
-                    }
-                }
-            ],
-            as: "users"
-        }
-    },
-    {
-        $lookup: {
-            from: 'messages',
-            let: {
-                messageIds: "$messageIds"
-            },
-            pipeline: [
-                {
-                    $match: {
-                        $expr: {
-                            $in: [
-                                "$_id",
-                                "$$messageIds"
-                            ]
-                        }
-                    }
-                }
-            ],
-            as: "messages"
-        }
-    },
-    {
-        $project: {
-            "users.password": 0,
-            "users.refreshToken": 0
-        }
-    },
-    {
-        $skip: (page - 1) * limit,
-    },
-    {
-        $limit: limit
-    },
-    {
-        $addFields: {
-            totalCount: limit,
-            page: page,
-            limit: limit
-        }
+        ]);
+        return chat;
     }
-]);
+    catch (error) {
+        throw new api_error_1.ApiError(500, "Something went wrong while finding chats by user id");
+    }
+});
 exports.getChatsByUserId = getChatsByUserId;
 const getChatById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {

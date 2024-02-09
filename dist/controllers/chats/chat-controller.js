@@ -19,7 +19,7 @@ const createChat = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(voi
     const response = yield (0, chat_service_1.createChatService)(req.user, req.body);
     response.userIds.forEach((user) => {
         if (user.userId !== (req === null || req === void 0 ? void 0 : req.user._id)) {
-            (0, socket_1.emitSocketEvent)(req, user.userId, constants_1.ChatEventEnum.NEW_CHAT_EVENT, response);
+            (0, socket_1.emitSocketEvent)(req, user.userId.toString(), constants_1.ChatEventEnum.NEW_CHAT_EVENT, response);
         }
     });
     return res.
@@ -35,7 +35,8 @@ const getChatById = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(vo
 }));
 exports.getChatById = getChatById;
 const getChatByUserId = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield (0, chat_service_1.getChatByUserIdService)(req.params.userId);
+    var _a;
+    const response = yield (0, chat_service_1.getChatByUserIdService)(req.user._id || ((_a = req.params) === null || _a === void 0 ? void 0 : _a.userId));
     return res.
         status(200).
         json(new api_response_1.ApiResponse(201, response, 'Chat get successfully'));

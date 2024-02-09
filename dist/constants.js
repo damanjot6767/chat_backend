@@ -19,7 +19,7 @@ var ChatEventEnum;
     ChatEventEnum["SOCKET_ERROR_EVENT"] = "socketError";
     ChatEventEnum["STOP_TYPING_EVENT"] = "stopTyping";
     ChatEventEnum["TYPING_EVENT"] = "typing";
-})(ChatEventEnum = exports.ChatEventEnum || (exports.ChatEventEnum = {}));
+})(ChatEventEnum || (exports.ChatEventEnum = ChatEventEnum = {}));
 exports.cookieOptions = {
     domain: 'localhost',
     path: '/',
@@ -31,14 +31,14 @@ var UserLoginType;
     UserLoginType["GOOGLE"] = "GOOGLE";
     UserLoginType["GITHUB"] = "GITHUB";
     UserLoginType["EMAIL_PASSWORD"] = "EMAIL_PASSWORD";
-})(UserLoginType = exports.UserLoginType || (exports.UserLoginType = {}));
+})(UserLoginType || (exports.UserLoginType = UserLoginType = {}));
 ;
 exports.AvailableSocialLogins = Object.values(UserLoginType);
 var ChatType;
 (function (ChatType) {
     ChatType["INDIVIDUAL"] = "INDIVIDUAL";
     ChatType["GROUP"] = "GROUP";
-})(ChatType = exports.ChatType || (exports.ChatType = {}));
+})(ChatType || (exports.ChatType = ChatType = {}));
 ;
 exports.AvailableChatType = Object.values(ChatType);
 exports.swaggerOptions = {

@@ -79,14 +79,14 @@ const RegisterMailOptions = (user, confirmationToken) => __awaiter(void 0, void 
 });
 exports.RegisterMailOptions = RegisterMailOptions;
 const ForgetPasswordMailOptions = (user, confirmationToken) => {
-    const confirmationLink = `https://chat-h247xktsc-damanjot6767.vercel.app//newPassword?token=${confirmationToken}`;
+    const confirmationLink = `https://chat-5jz7v114p-damanjot6767.vercel.app/newPassword?token=${confirmationToken}`;
     return {
         from: {
             name: 'Free Chat',
             address: process.env.NODEMAIL_USER
         },
-        to: user.email,
-        subject: "Forget password to Free chat",
+        to: user.email, // list of receivers
+        subject: "Forget password to Free chat", // Subject line
         html: `
         <p>Hello,</p>
         <p>Click the following link to forget your password:</p>

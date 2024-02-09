@@ -26,9 +26,11 @@ const createChatService = (user, createChatDto) => __awaiter(void 0, void 0, voi
         yield (0, user_model_1.getUserById)(userObject.userId);
     }
     const chat = yield (0, chat_model_1.getChatByUserIds)(createChatDto.userIds);
-    if (chat)
-        throw new api_error_1.ApiError(400, 'Chat already exist');
+    if (chat) {
+        return chat;
+    }
     createChatDto.userIds = userIds;
+    createChatDto.createdBy = user._id;
     const chatResponse = yield (0, chat_model_1.createChat)(createChatDto);
     return chatResponse;
 });
