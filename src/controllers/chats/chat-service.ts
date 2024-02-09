@@ -14,6 +14,7 @@ export const createChatService = async (
             return { isChatDelete: false, userId: id }
         }
     })
+    
     if (!createChatDto.userIds.length) throw new ApiError(400, 'Receiver user id must be different from main user');
 
     userIds.push({ isChatDelete: false, userId: user._id })
@@ -22,9 +23,12 @@ export const createChatService = async (
     }
 
     const chat = await getChatByUserIds(createChatDto.userIds)
-    if (chat) throw new ApiError(400, 'Chat already exist')
+    if (chat) {
+        return chat
+    }
 
     createChatDto.userIds = userIds;
+    createChatDto.createdBy = user._id
     const chatResponse = await createChat(createChatDto)
     return chatResponse
 }

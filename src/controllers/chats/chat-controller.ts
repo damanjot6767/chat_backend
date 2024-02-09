@@ -13,7 +13,7 @@ const createChat = asyncHandler(async (req, res) => {
     response.userIds.forEach((user)=>{
 
         if(user.userId!==req?.user._id){
-            emitSocketEvent(req,user.userId,ChatEventEnum.NEW_CHAT_EVENT,response)
+            emitSocketEvent(req,user.userId.toString(),ChatEventEnum.NEW_CHAT_EVENT,response)
         }
 
     })
@@ -43,7 +43,7 @@ const getChatById = asyncHandler(async (req, res) => {
 
 const getChatByUserId = asyncHandler(async (req, res) => {
 
-    const response = await getChatByUserIdService(req.params.userId)
+    const response = await getChatByUserIdService(req.user._id || req.params?.userId)
 
     return res.
         status(200).

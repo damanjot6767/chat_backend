@@ -9,6 +9,7 @@ interface Chat {
   messageIds: any[];
   messages: string[];
   latestMessage: string;
+  createdBy: string;
   chatType?: ChatType;
   createdAt: Date;
   updatedAt: Date

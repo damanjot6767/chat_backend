@@ -19,7 +19,7 @@ const GetChatParamJoiValidation = asyncHandler(async (req, res, next) => {
 const GetChatByUserIdParamJoiValidation = asyncHandler(async (req, res, next) => {
 
     const chatParam = Joi.object({
-        userId: Joi.string().required()
+        userId: Joi.string().optional()
     })
 
     const { error, value } = chatParam.validate(req.params);

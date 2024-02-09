@@ -8,7 +8,8 @@ interface CreateChatResponseDto extends Chat {
 interface CreateChatDto {
     name?: string,
     chatTYpe: ChatType,
-    userIds: any[]
+    userIds: any[],
+    createdBy: string,
 }
 
 export { CreateChatResponseDto, CreateChatDto }

@@ -16,6 +16,10 @@ export const chatSchema = new Schema(
             enum: Object.values(ChatType),
             default: ChatType.INDIVIDUAL
         },
+        createdBy: {
+            type: Schema.Types.ObjectId,
+            ref: "Users"
+        },
         userIds: [
             {
                 isChatDelete: {
@@ -37,7 +41,8 @@ export const chatSchema = new Schema(
         latestMessage:
         {
             type: Schema.Types.ObjectId,
-            ref: "Messages"
+            ref: "Messages",
+            default: null
         }
     },
     {
@@ -50,81 +55,75 @@ export const ChatModel = mongoose.model('Chat', chatSchema);
 
 // Chat Services
 export const getChatsByUserId =
-    (
+    async (
         userId: string,
         page: number = 1,
         limit: number = 10
-    ): Promise<ChatResponseDto[]> =>
-        ChatModel.aggregate([
-            {
-                $match: {
-                    userIds: {
-                        $elemMatch: { $eq: new mongoose.Types.ObjectId(userId) }
+    ): Promise<ChatResponseDto[]> => {
+        try {
+            const chat: any = await ChatModel.aggregate([
+                {
+                    $match: {
+                        userIds: {
+                            $elemMatch: { userId: new mongoose.Types.ObjectId(userId) }
+                        }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        let: {
+                            userId: "$userIds.userId"
+                        },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $in: [
+                                            "$_id",
+                                            "$$userId"
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        as: "users"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'messages',
+                        let: {
+                            messageIds: "$messageIds"
+                        },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $in: [
+                                            "$_id",
+                                            "$$messageIds"
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        as: "messages"
+                    }
+                },
+                {
+                    $project: {
+                        "users.password": 0,
+                        "users.refreshToken": 0
                     }
                 }
-            },
-            {
-                $lookup: {
-                    from: 'users',
-                    let: {
-                        userId: "$userIds.userId"
-                    },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $in: [
-                                        "$_id",
-                                        "$$userId"
-                                    ]
-                                }
-                            }
-                        }
-                    ],
-                    as: "users"
-                }
-            },
-            {
-                $lookup: {
-                    from: 'messages',
-                    let: {
-                        messageIds: "$messageIds"
-                    },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $in: [
-                                        "$_id",
-                                        "$$messageIds"
-                                    ]
-                                }
-                            }
-                        }
-                    ],
-                    as: "messages"
-                }
-            },
-            {
-                $project: {
-                    "users.password": 0,
-                    "users.refreshToken": 0
-                }
-            },
-            {
-                $skip: (page - 1) * limit,
-            },
-            {
-                $limit: limit
-            },
-            {
-                $addFields: {
-                    totalCount: limit,
-                    page: page,
-                    limit: limit
-                }
-            }
-        ]);
+            ]);
+
+            return chat
+        } catch (error) {
+            throw new ApiError(500, "Something went wrong while finding chats by user id")
+        }
+    }
 
 
 export const getChatById = async (id: string): Promise<ChatResponseDto> => {
