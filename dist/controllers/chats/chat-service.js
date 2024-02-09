@@ -27,6 +27,7 @@ const createChatService = (user, createChatDto) => __awaiter(void 0, void 0, voi
     }
     const chat = yield (0, chat_model_1.getChatByUserIds)(createChatDto.userIds);
     if (chat) {
+        chat['message'] = 'Chat already created';
         return chat;
     }
     createChatDto.userIds = userIds;

@@ -17,6 +17,7 @@ require('dotenv').config();
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const ejs_1 = __importDefault(require("ejs"));
 const path_1 = __importDefault(require("path"));
+const constants_1 = require("../constants");
 const transporter = nodemailer_1.default.createTransport({
     service: 'gmail',
     host: "smtp.gmail.com",
@@ -79,7 +80,7 @@ const RegisterMailOptions = (user, confirmationToken) => __awaiter(void 0, void 
 });
 exports.RegisterMailOptions = RegisterMailOptions;
 const ForgetPasswordMailOptions = (user, confirmationToken) => {
-    const confirmationLink = `https://chat-5jz7v114p-damanjot6767.vercel.app/newPassword?token=${confirmationToken}`;
+    const confirmationLink = `${process.env.FRONTEND_REDIRECT_URL + constants_1.FrontendRoutes.NewPassword}?token=${confirmationToken}`;
     return {
         from: {
             name: 'Free Chat',

@@ -54,7 +54,7 @@ export const RegisterMailOptions = async (user:User, confirmationToken: string) 
                 name: 'Free Chat',
                 address: process.env.NODEMAIL_USER,
             },
-            to: 'damanjot6767@gmail.com',
+            to: user.email,
             subject: 'Welcome to free chat ✔',
             text: 'Hello world?',
             html: data,

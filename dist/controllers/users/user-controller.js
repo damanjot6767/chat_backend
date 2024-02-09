@@ -72,7 +72,7 @@ const confirmMail = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(vo
         res.render('mail-already-confirmed', {
             userEmail: response.email,
             userName: response.fullName,
-            link: process.env.FRONTEND_REDIRECT_URL
+            link: process.env.FRONTEND_REDIRECT_URL + constants_1.FrontendRoutes.Users
         });
         return;
     }
@@ -80,7 +80,7 @@ const confirmMail = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(vo
     res.render('mail-confirmation-success', {
         userEmail: response.email,
         userName: response.fullName,
-        link: process.env.FRONTEND_REDIRECT_URL
+        link: process.env.FRONTEND_REDIRECT_URL + constants_1.FrontendRoutes.Users
     });
 }));
 exports.confirmMail = confirmMail;

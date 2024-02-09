@@ -17,14 +17,20 @@ const async_handler_1 = require("../../utils/async-handler");
 const chat_service_1 = require("./chat-service");
 const createChat = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield (0, chat_service_1.createChatService)(req.user, req.body);
+    if (response['message']) {
+        delete response['message'];
+        return res.
+            status(201).
+            json(new api_response_1.ApiResponse(201, response, 'Chat already created'));
+    }
+    res.
+        status(201).
+        json(new api_response_1.ApiResponse(201, response, 'Chat created successfully'));
     response.userIds.forEach((user) => {
         if (user.userId !== (req === null || req === void 0 ? void 0 : req.user._id)) {
             (0, socket_1.emitSocketEvent)(req, user.userId.toString(), constants_1.ChatEventEnum.NEW_CHAT_EVENT, response);
         }
     });
-    return res.
-        status(201).
-        json(new api_response_1.ApiResponse(201, response, 'Chat created successfully'));
 }));
 exports.createChat = createChat;
 const getChatById = (0, async_handler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

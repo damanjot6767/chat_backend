@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.swaggerOptions = exports.AvailableChatType = exports.ChatType = exports.AvailableSocialLogins = exports.UserLoginType = exports.cookieOptions = exports.ChatEventEnum = exports.AvailableUserRoles = exports.UserRolesEnum = exports.DB_NAME = void 0;
+exports.swaggerOptions = exports.AvailableChatType = exports.ChatType = exports.AvailableSocialLogins = exports.UserLoginType = exports.cookieOptions = exports.FrontendRoutes = exports.ChatEventEnum = exports.AvailableUserRoles = exports.UserRolesEnum = exports.DB_NAME = void 0;
 exports.DB_NAME = 'chat';
 exports.UserRolesEnum = {
     ADMIN: "ADMIN",
@@ -20,6 +20,15 @@ var ChatEventEnum;
     ChatEventEnum["STOP_TYPING_EVENT"] = "stopTyping";
     ChatEventEnum["TYPING_EVENT"] = "typing";
 })(ChatEventEnum || (exports.ChatEventEnum = ChatEventEnum = {}));
+exports.FrontendRoutes = {
+    Signup: '/signup',
+    Login: '/login',
+    ForgetPassword: '/forgetPassword',
+    NewPassword: '/newPassword',
+    VerifyEmail: '/verifyEmail',
+    Users: '/users',
+    Conversations: '/conversations'
+};
 exports.cookieOptions = {
     domain: 'localhost',
     path: '/',
