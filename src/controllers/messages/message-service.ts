@@ -14,10 +14,12 @@ export const createMessageService = async (
 
     createMessageDto.userIds = userIds;
     createMessageDto.messageSentBy = user._id;
-    const messageResponse = await createMessage(createMessageDto);
+    let messageResponse = await createMessage(createMessageDto); 
 
     chat.messageIds.push(messageResponse._id)
     await updateChatById(chat._id, { messageIds: chat.messageIds })
+
+    messageResponse = await getMessageById(messageResponse._id)
 
     return messageResponse
 }

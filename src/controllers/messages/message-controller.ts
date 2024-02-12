@@ -13,7 +13,7 @@ const createMessage = asyncHandler(async (req, res) => {
     response.userIds.forEach((user)=>{
 
         if(user.userId!==req?.user._id){
-            emitSocketEvent(req,user.userId,ChatEventEnum.MESSAGE_RECEIVED_EVENT,response)
+            emitSocketEvent(req,user?.userId?.toString(),ChatEventEnum.MESSAGE_RECEIVED_EVENT,response)
         }
 
     })
