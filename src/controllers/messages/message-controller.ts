@@ -10,21 +10,22 @@ const createMessage = asyncHandler(async (req, res) => {
 
     const response = await createMessageService(req.user, req.body)
 
-    response.userIds.forEach((user)=>{
+   
 
-        if(user.userId.toString()!==req?.user._id.toString()){
-            emitSocketEvent(req,user?.userId?.toString(),ChatEventEnum.MESSAGE_RECEIVED_EVENT,response)
-        }
-
-    })
-
-    return res.
+        res.
         status(201).
         json(
             new ApiResponse(
                 201, response, 'Message created successfully'
             )
         )
+        response.userIds.forEach((user)=>{
+
+            if(user.userId.toString()!==req?.user._id.toString()){
+                emitSocketEvent(req,user?.userId?.toString(),ChatEventEnum.MESSAGE_RECEIVED_EVENT,response)
+            }
+    
+        })
 })
 
 const updateMessage = asyncHandler(async (req, res) => {
