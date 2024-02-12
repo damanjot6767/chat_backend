@@ -1,5 +1,5 @@
 import { getChatById, updateChatById } from "../../models/chat.model";
-import { createMessage, getMessageById, updateMessageById } from "../../models/message.model";
+import { createMessage, getMessageById, getMessagesByChatId, updateMessageById } from "../../models/message.model";
 import { ApiError } from "../../utils/api-error";
 import { CreateMessageDto, CreateMessageResponseDto } from "./dto/create-message-dto";
 import { UpdateMessageDto, UpdateMessageResponseDto } from "./dto/update-message-dto";
@@ -34,6 +34,17 @@ export const updateMessageService = async (
 
     const message = await updateMessageById(id, updateMessageDto)
     return message
+}
+
+export const getMessagesByChatIdService = async (
+    id: string,
+): Promise<CreateMessageResponseDto[]> => {
+    const chat = await getChatById(id);
+
+    if(!chat) throw new ApiError(400, 'Invalid Chat id')
+
+    const messages = await getMessagesByChatId(id)
+    return messages
 }
 
 export const deleteMessageService = async (

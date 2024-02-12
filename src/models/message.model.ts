@@ -168,6 +168,49 @@ export const getMessageById = async (id: string): Promise<MessageResponseDto> =>
     }
 }
 
+export const getMessagesByChatId = async (id: string): Promise<MessageResponseDto[]> => {
+    try {
+        const message: any = await MessageModel.aggregate([
+            {
+                $match: {
+                    chatId: new mongoose.Types.ObjectId(id)
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    let: {
+                        userId: "$userIds.userId"
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: [
+                                        "$_id",
+                                        "$$userId"
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: "users"
+                }
+            },
+            {
+                $project: {
+                    "users.password": 0,
+                    "users.refreshToken": 0
+                }
+            }
+        ]);
+
+        return message
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while finding chat by id")
+    }
+}
+
 export const createMessage = <MesssagePayload>(values: MesssagePayload): Promise<CreateMessageResponseDto> => MessageModel.create(values);
 export const deleteMessageById = (id: string): any => MessageModel.findOneAndDelete({ _id: id });
 export const updateMessageById = <MesssagePayload>(id: string, values: MesssagePayload): Promise<CreateMessageResponseDto> => MessageModel.findByIdAndUpdate(id, values, { new: true });
