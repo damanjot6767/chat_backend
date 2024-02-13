@@ -5,6 +5,8 @@ import { ChatEventEnum } from "../constants";
 import { Request } from "express";
 import { UserModel } from "../models/index";
 import { ApiError } from "../utils/api-error";
+import { getChatByUserIdService } from "../controllers/chats/chat-service";
+import { ChatResponseDto, CreateChatDto } from "../controllers/chats/dto";
 
 interface SocketWithUser extends Socket {
     user: any
@@ -13,25 +15,24 @@ interface SocketWithUser extends Socket {
 const mountJoinChatEvent = (socket: SocketWithUser) => {
     socket.on(ChatEventEnum.JOIN_CHAT_EVENT, (chatId: string) => {
         console.log(`User joined the chat 🤝. chatId: `, chatId);
-        // joining the room with the chatId will allow specific events to be fired where we don't bother about the users like typing events
-        // E.g. When user types we don't want to emit that event to specific participant.
-        // We want to just emit that to the chat where the typing is happening
         socket.join(chatId);
     });
 };
 
 const mountParticipantTypingEvent = (socket: SocketWithUser) => {
     socket.on(ChatEventEnum.TYPING_EVENT, (chatId: any) => {
-        console.log(ChatEventEnum.TYPING_EVENT)
         socket.in(chatId).emit(ChatEventEnum.TYPING_EVENT, chatId);
     });
 };
 
 const mountParticipantStoppedTypingEvent = (socket: SocketWithUser) => {
     socket.on(ChatEventEnum.STOP_TYPING_EVENT, (chatId: string) => {
-        console.log(ChatEventEnum.STOP_TYPING_EVENT)
         socket.in(chatId).emit(ChatEventEnum.STOP_TYPING_EVENT, chatId);
     });
+};
+
+const emitJoinChatEvents = (socket: SocketWithUser, chats:ChatResponseDto[]) => {
+        chats?.map((chat)=>socket.join(chat._id?.toString()))
 };
 
 const initializeSocketIO = (io: Server) => {
@@ -64,6 +65,7 @@ const initializeSocketIO = (io: Server) => {
             }
             socket.user = user; // mount te user object to the socket
 
+
             // We are creating a room with user id so that if user is joined but does not have any active chat going on.
             // still we want to emit some socket events to the user.
             // so that the client can catch the event and show the notifications.
@@ -75,6 +77,10 @@ const initializeSocketIO = (io: Server) => {
             mountJoinChatEvent(socket);
             mountParticipantTypingEvent(socket);
             mountParticipantStoppedTypingEvent(socket);
+
+            // // when ever user login then we create room with chat id that perticular user
+            // const chats = await getChatByUserIdService(user?._id);
+            // emitJoinChatEvents(socket, chats)
 
 
             socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {

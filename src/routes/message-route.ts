@@ -21,16 +21,16 @@ router.route('/update/:id').post(
     updateMessage
 )
 
-router.route('/by-chat-id/:id').get(
-    verifyJWT,
-    GetMessageByIdParamJoiValidation,
-    getMessagesByChatId
-)
-
 router.route('/delete/:id').delete(
     verifyJWT,
     GetMessageByIdParamJoiValidation,
     deleteMessage
+)
+
+router.route('/by-chat-id/:id').get(
+    verifyJWT,
+    GetMessageByIdParamJoiValidation,
+    getMessagesByChatId
 )
 
 export default router;
