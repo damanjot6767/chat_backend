@@ -193,11 +193,63 @@ export const getChatById = async (id: string): Promise<ChatResponseDto> => {
 
 export const getChatByUserIds = async (userIds: string[]): Promise<any> => {
     try {
-        const chat: any = await ChatModel.findOne({
-            userIds: {
-                $all: userIds.map(userId => ({ $elemMatch: { userId } }))
+        const chat: any = await ChatModel.aggregate([
+            {
+                $match: {
+                    userIds: {
+                        $all: userIds.map(userId => ({ $elemMatch: { userId: new mongoose.Types.ObjectId(userId) } }))
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    let: {
+                        userId: "$userIds.userId"
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: [
+                                        "$_id",
+                                        "$$userId"
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: "users"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'messages',
+                    let: {
+                        messageIds: "$messageIds"
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: [
+                                        "$_id",
+                                        "$$messageIds"
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: "messages"
+                }
+            },
+            {
+                $project: {
+                    "users.password": 0,
+                    "users.refreshToken": 0
+                }
             }
-        });
+        ]);
         return chat
     } catch (error) {
         throw new ApiError(500, "Something went wrong while finding chat by id")

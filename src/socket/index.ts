@@ -4,8 +4,7 @@ import { Server, Socket } from "socket.io";
 import { ChatEventEnum } from "../constants";
 import { Request } from "express";
 import { UserModel } from "../models/index";
-import { ApiError } from "../utils/api-error";
-import { getChatByUserIdService } from "../controllers/chats/chat-service";
+import { ApiError } from "../utils/api-error";;
 import { ChatResponseDto, CreateChatDto } from "../controllers/chats/dto";
 
 interface SocketWithUser extends Socket {
@@ -20,14 +19,14 @@ const mountJoinChatEvent = (socket: SocketWithUser) => {
 };
 
 const mountParticipantTypingEvent = (socket: SocketWithUser) => {
-    socket.on(ChatEventEnum.TYPING_EVENT, (chatId: any) => {
-        socket.in(chatId).emit(ChatEventEnum.TYPING_EVENT, chatId);
+    socket.on(ChatEventEnum.TYPING_EVENT, (data: any) => {
+        socket.in(data?.receiverId).emit(ChatEventEnum.TYPING_EVENT, data);
     });
 };
 
 const mountParticipantStoppedTypingEvent = (socket: SocketWithUser) => {
-    socket.on(ChatEventEnum.STOP_TYPING_EVENT, (chatId: string) => {
-        socket.in(chatId).emit(ChatEventEnum.STOP_TYPING_EVENT, chatId);
+    socket.on(ChatEventEnum.STOP_TYPING_EVENT, (data: any) => {
+        socket.in(data?.receiverId).emit(ChatEventEnum.STOP_TYPING_EVENT, data);
     });
 };
 
