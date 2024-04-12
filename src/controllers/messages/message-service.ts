@@ -1,5 +1,5 @@
-import { getChatById, updateChatById } from "../../models/chat.model";
-import { createMessage, getMessageById, getMessagesByChatId, updateMessageById } from "../../models/message.model";
+import { getAggregationChatById, getChatById, updateChatById } from "../../models/chat.model";
+import { createManyMessage, createMessage, getMessageById, getMessagesByChatId, updateMessageById } from "../../models/message.model";
 import { ApiError } from "../../utils/api-error";
 import { CreateMessageDto, CreateMessageResponseDto } from "./dto/create-message-dto";
 import { UpdateMessageDto, UpdateMessageResponseDto } from "./dto/update-message-dto";
@@ -9,7 +9,7 @@ export const createMessageService = async (
     createMessageDto: CreateMessageDto,
 ): Promise<CreateMessageResponseDto> => {
 
-    const chat = await getChatById(createMessageDto.chatId)
+    const chat = await getAggregationChatById(createMessageDto.chatId)
     const userIds = chat.userIds.map((item) => ({ isMessageDelete: false, userId: item.userId }))
 
     createMessageDto.userIds = userIds;
@@ -20,6 +20,31 @@ export const createMessageService = async (
     await updateChatById(chat._id, { messageIds: chat.messageIds })
 
     messageResponse = await getMessageById(messageResponse._id)
+
+    return messageResponse
+}
+
+export const createMultipleMessagesService = async (
+    user,
+    createMessageDto: CreateMessageDto,
+): Promise<CreateMessageResponseDto> => {
+
+    const chat = await getChatById(createMessageDto?.chatId)
+    const userIds = chat.userIds.map((item) => ({ isMessageDelete: false, userId: item.userId }))
+
+    createMessageDto.userIds = userIds;
+    createMessageDto.messageSentBy = user._id;
+
+    let messageResponse = await createManyMessage(createMessageDto); 
+
+    if(messageResponse?.length){
+        messageResponse.forEach((ele)=>{
+            chat.messageIds.push(ele._id)
+        })
+    
+        await updateChatById(chat._id, { messageIds: chat.messageIds })
+        messageResponse = await getMessageById(messageResponse[messageResponse?.length-1]._id)
+    }
 
     return messageResponse
 }

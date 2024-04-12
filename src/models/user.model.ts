@@ -136,7 +136,8 @@ export const getUserByEmail = (email: string): Promise<UserResponseDto> => UserM
 export const getUserByLoginCredential = async (email: string, password: string): Promise<UserResponseDto> => {
     try {
         const user = await UserModel.findOne({ email }).select('+password');
-        const isPasswordValid = await user.isPasswordCorrect(password);
+        if(!user) throw new ApiError(400, 'Invalis credentials');
+        const isPasswordValid = await user?.isPasswordCorrect(password);
 
         if (!isPasswordValid) throw new ApiError(400, 'Invalis credentials');
 

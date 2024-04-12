@@ -5,9 +5,9 @@ interface Chat {
   _id: string;
   name: string;
   userIds: any[];
-  users: string[] | User[];
+  users?: string[] | User[];
   messageIds: any[];
-  messages: string[];
+  messages?: string[];
   latestMessage: string;
   createdBy: string;
   chatType?: ChatType;

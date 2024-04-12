@@ -3,6 +3,7 @@ import { ChatType } from '../constants';
 import { ChatResponseDto, CreateChatResponseDto } from '../controllers/chats/dto';
 import { boolean, string } from 'joi';
 import { ApiError } from '../utils/api-error';
+import { getChatByIdRedis, setChatByIdRedis } from './chat-redis-service';
 
 
 
@@ -126,7 +127,7 @@ export const getChatsByUserId =
     }
 
 
-export const getChatById = async (id: string): Promise<ChatResponseDto> => {
+export const getAggregationChatById = async (id: string): Promise<ChatResponseDto> => {
     try {
         const chat: any = await ChatModel.aggregate([
             {
@@ -255,7 +256,18 @@ export const getChatByUserIds = async (userIds: string[]): Promise<any> => {
         throw new ApiError(500, "Something went wrong while finding chat by id")
     }
 }
+export const getChatById = async (id: string): Promise<any> => {
+    try {
+        const isCache = await getChatByIdRedis(id); 
+        if(isCache) return isCache;
 
+        const response =  await ChatModel.findOne({ _id: id })
+        await setChatByIdRedis(response)
+        return response
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while finding chat by id")
+    }
+};
 export const createChat = <ChatPayload>(values: ChatPayload): Promise<CreateChatResponseDto> => ChatModel.create(values);
 export const deleteChatById = (id: string): any => ChatModel.findOneAndDelete({ _id: id });
 export const updateChatById = <ChatPayload>(id: string, values: ChatPayload): Promise<CreateChatResponseDto> => ChatModel.findByIdAndUpdate(id, values, { new: true });

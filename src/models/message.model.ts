@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
 import { ApiError } from '../utils/api-error';
-import { CreateMessageResponseDto } from '../controllers/messages/dto/create-message-dto';
+import { CreateMessageDto, CreateMessageResponseDto } from '../controllers/messages/dto/create-message-dto';
 import { MessageResponseDto } from '../controllers/messages/dto/message-dto';
+import { deleteMessagesRedis, pullMessageRedis, pushMessageRedis } from '../controllers/messages/message-redis-service';
 
 
 
@@ -53,6 +54,10 @@ export const messageSchema = new Schema(
         timestamps: true
     }
 )
+
+// messageSchema.pre("insertMany", async function (next) {
+//     this._id
+// })
 
 export const MessageModel = mongoose.model('Messages', messageSchema);
 
@@ -168,8 +173,10 @@ export const getMessageById = async (id: string): Promise<MessageResponseDto> =>
     }
 }
 
-export const getMessagesByChatId = async (id: string): Promise<MessageResponseDto[]> => {
+export const getMessagesByChatId = async (id: string, page: number = 1, limit: number = 10): Promise<MessageResponseDto[]> => {
     try {
+        const isCacheMessages = await pullMessageRedis(id);
+        if(isCacheMessages?.length) return isCacheMessages
         const message: any = await MessageModel.aggregate([
             {
                 $match: {
@@ -202,6 +209,12 @@ export const getMessagesByChatId = async (id: string): Promise<MessageResponseDt
                     "users.password": 0,
                     "users.refreshToken": 0
                 }
+            },
+            {
+                $skip: (page - 1) * limit // Skip documents based on the current page
+            },
+            {
+                $limit: limit // Limit the number of documents per page
             }
         ]);
 
@@ -211,7 +224,26 @@ export const getMessagesByChatId = async (id: string): Promise<MessageResponseDt
     }
 }
 
+export const createManyMessage = async (payload: CreateMessageDto): Promise<any> => {
+    try {
+        const isCache = await pushMessageRedis(payload);
+
+        const isCacheMessages = await pullMessageRedis(payload?.chatId);
+
+        if(isCacheMessages?.length>=100){
+            const response = await MessageModel.insertMany(isCacheMessages);
+            await deleteMessagesRedis(payload?.chatId);
+            return response
+        }
+       
+        return isCache;
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while create messages")
+    }
+}
+
 export const createMessage = <MesssagePayload>(values: MesssagePayload): Promise<CreateMessageResponseDto> => MessageModel.create(values);
+
 export const deleteMessageById = (id: string): any => MessageModel.findOneAndDelete({ _id: id });
 export const updateMessageById = <MesssagePayload>(id: string, values: MesssagePayload): Promise<CreateMessageResponseDto> => MessageModel.findByIdAndUpdate(id, values, { new: true });
 

@@ -1,6 +1,6 @@
 import { ApiError } from "../../utils/api-error";
 import { UpdateChatDto, ChatResponseDto, CreateChatResponseDto, CreateChatDto } from "./dto";
-import { createChat, deleteChatById, getChatById, getChatByUserIds, getChatsByUserId, updateChatById } from "../../models/chat.model";
+import { createChat, deleteChatById, getAggregationChatById, getChatByUserIds, getChatsByUserId, updateChatById } from "../../models/chat.model";
 import { User } from "../users/dto/user-dto";
 import { getUserById } from "../../models/user.model";
 
@@ -33,7 +33,7 @@ export const createChatService = async (
         createChatDto.createdBy = user._id
 
         let chatResponse = await createChat(createChatDto)
-        chatResponse = await getChatById(chatResponse._id)
+        chatResponse = await getAggregationChatById(chatResponse._id)
         return chatResponse
     }
 }
@@ -43,7 +43,7 @@ export const getChatService = async (
     id: string,
 ): Promise<ChatResponseDto> => {
 
-    const chat = await getChatById(id)
+    const chat = await getAggregationChatById(id)
     return chat
 }
 
@@ -69,7 +69,7 @@ export const deleteChatService = async (
     id: string,
 ): Promise<any> => {
 
-    const chat = await getChatById(id)
+    const chat = await getAggregationChatById(id)
 
     chat?.userIds.forEach((item) => {
 

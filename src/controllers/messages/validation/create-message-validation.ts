@@ -6,16 +6,24 @@ import mongoose from 'mongoose';
 const CreateMessageJoiValidation = asyncHandler(async (req, res, next) => {
 
     const messageObject = Joi.object({
-        body: Joi.string(),
-        image: Joi.string(),
-        file: Joi.string(),
-        video: Joi.string(),
+        body: Joi.string().allow(null),
+        image: Joi.string().allow(null),
+        file: Joi.string().allow(null),
+        video: Joi.string().allow(null),
         chatId: Joi.string().required().custom((value, helpers) => {
             if (!mongoose.Types.ObjectId.isValid(value)) {
                 return helpers.error('id must be mongoose id');
             }
             return new mongoose.Types.ObjectId(value);;
         }),
+        userIds: Joi.array().items(
+            Joi.string().required().custom((value, helpers) => {
+                if (!mongoose.Types.ObjectId.isValid(value)) {
+                    return helpers.error('id must be mongoose id');
+                }
+                return new mongoose.Types.ObjectId(value);;
+            }),
+        )
     }).or('body', 'image', 'file', 'video').required();
 
     const { error, value } = messageObject.validate(req.body);
