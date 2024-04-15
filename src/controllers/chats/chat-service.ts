@@ -1,6 +1,6 @@
 import { ApiError } from "../../utils/api-error";
 import { UpdateChatDto, ChatResponseDto, CreateChatResponseDto, CreateChatDto } from "./dto";
-import { createChat, deleteChatById, getAggregationChatById, getChatByUserIds, getChatsByUserId, updateChatById } from "../../models/chat.model";
+import { createChat, deleteChatById, getAggregationChatById, getChatByUserIds, getAggregationChatsByUserId, updateChatById } from "../../models/chat.model";
 import { User } from "../users/dto/user-dto";
 import { getUserById } from "../../models/user.model";
 
@@ -51,7 +51,7 @@ export const getChatByUserIdService = async (
     id: string,
 ): Promise<ChatResponseDto[]> => {
 
-    const chat = await getChatsByUserId(id)
+    const chat = await getAggregationChatsByUserId(id)
     return chat
 }
 

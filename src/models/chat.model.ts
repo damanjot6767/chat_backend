@@ -55,7 +55,7 @@ export const ChatModel = mongoose.model('Chat', chatSchema);
 
 
 // Chat Services
-export const getChatsByUserId =
+export const getAggregationChatsByUserId =
     async (
         userId: string,
         page: number = 1,
@@ -125,7 +125,19 @@ export const getChatsByUserId =
             throw new ApiError(500, "Something went wrong while finding chats by user id")
         }
     }
+export const getChatsByUserId = async ( userId: string, page: number = 1, limit: number = 10): Promise<ChatResponseDto[]> => {
+    try {
+        const chat: any = await ChatModel.find({
+            userIds: {
+                $elemMatch: { userId: new mongoose.Types.ObjectId(userId) }
+            }
+        });
 
+        return chat
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while finding chats by user id")
+    }
+}
 
 export const getAggregationChatById = async (id: string): Promise<ChatResponseDto> => {
     try {

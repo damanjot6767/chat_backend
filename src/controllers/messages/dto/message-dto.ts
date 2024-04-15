@@ -11,6 +11,7 @@ interface Message {
   users: User[];
   messageSentBy: User;
   chat: Chat;
+  chatId: string;
   createdAt: Date;
   updatedAt: Date
 }
