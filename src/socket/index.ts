@@ -1,46 +1,18 @@
 import cookie from "cookie";
 import jwt from "jsonwebtoken";
-import { Server, Socket } from "socket.io";
+import WebSocket, { WebSocketServer} from "ws";
 import { ChatEventEnum } from "../constants";
 import { Request } from "express";
 import { UserModel } from "../models/index";
 import { ApiError } from "../utils/api-error";;
 import { ChatResponseDto, CreateChatDto } from "../controllers/chats/dto";
 
-interface SocketWithUser extends Socket {
-    user: any
-}
 
-const mountJoinChatEvent = (socket: SocketWithUser) => {
-    socket.on(ChatEventEnum.JOIN_CHAT_EVENT, (chatId: string) => {
-        console.log(`User joined the chat 🤝. chatId: `, chatId);
-        socket.join(chatId);
-    });
-};
+const conversationsObject = {}
 
-const mountParticipantTypingEvent = (socket: SocketWithUser) => {
-    socket.on(ChatEventEnum.TYPING_EVENT, (data: any) => {
-        socket.in(data?.receiverId).emit(ChatEventEnum.TYPING_EVENT, data);
-    });
-};
-
-const mountParticipantStoppedTypingEvent = (socket: SocketWithUser) => {
-    socket.on(ChatEventEnum.STOP_TYPING_EVENT, (data: any) => {
-        socket.in(data?.receiverId).emit(ChatEventEnum.STOP_TYPING_EVENT, data);
-    });
-};
-
-const emitJoinChatEvents = (socket: SocketWithUser, chats:ChatResponseDto[]) => {
-        chats?.map((chat)=>socket.join(chat._id?.toString()))
-};
-
-const initializeSocketIO = (io: Server) => {
-    return io.on("connection", async (socket: SocketWithUser) => {
-        try {
-            // parse the cookies from the handshake headers (This is only possible if client has `withCredentials: true`)
-            const cookies = cookie.parse(socket.handshake.headers?.cookie || "");
-
-            let token:any = cookies?.accessToken; // get the accessToken
+const authorizeEvent = async(socket: any, data: any)=>{
+           try {
+            let token:any = data?.token; // get the accessToken
 
             if (!token) {
                 // If there is no access token in cookies. Check inside the handshake auth
@@ -63,43 +35,65 @@ const initializeSocketIO = (io: Server) => {
                 throw new ApiError(401, "Un-authorized handshake. Token is invalid");
             }
             socket.user = user; // mount te user object to the socket
+           } catch (error) {
+             socket
+           }
+}
 
+const initializeSocketIO = (io: WebSocketServer) => {
+    return io.on("connection", async (socket: WebSocketServer) => {
 
-            // We are creating a room with user id so that if user is joined but does not have any active chat going on.
-            // still we want to emit some socket events to the user.
-            // so that the client can catch the event and show the notifications.
-            socket.join(user._id.toString());
-            socket.emit(ChatEventEnum.CONNECTED_EVENT); // emit the connected event so that client is aware
-            console.log("User connected 🗼. userId: ", user._id.toString());
+            socket.on('message', async(res)=>{
+                try {
+                    const data = JSON.parse(res);
+                    if(data.event===ChatEventEnum.CONNECTED_EVENT){
+                        await authorizeEvent(socket,data)
+                        console.log('connected','new user connected ');
+                    }
 
-            // Common events that needs to be mounted on the initialization
-            mountJoinChatEvent(socket);
-            mountParticipantTypingEvent(socket);
-            mountParticipantStoppedTypingEvent(socket);
+                    else if(data.event===ChatEventEnum.JOIN_CHAT_EVENT){
+                        if(conversationsObject[data.chatId]){
+                            const sockets = [...conversationsObject[data.chatId],socket]
+                            conversationsObject[data.chatId]=sockets
 
-            // // when ever user login then we create room with chat id that perticular user
-            // const chats = await getChatByUserIdService(user?._id);
-            // emitJoinChatEvents(socket, chats)
+                        }
+                        else{
+                            conversationsObject[data.chatId]=[socket];
+                        }
+                    }
 
-
-            socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {
-                console.log("user has disconnected 🚫. userId: " + socket.user?._id);
-                if (socket.user?._id) {
-                    socket.leave(socket.user._id);
+                    else if(data.event===ChatEventEnum.MESSAGE_RECEIVED_EVENT){
+                        conversationsObject[data.chatId]?.map((item)=>{
+                            if(item!==socket){
+                                socket.send(data);
+                            }
+                        })
+                    }
+                    
+                    else if(data.event===ChatEventEnum.TYPING_EVENT){
+                        console.log('tyoing', conversationsObject[data.chatId])
+                        conversationsObject[data.chatId]?.map((item)=>{
+                            if(item!==socket){
+                                socket.send(data);
+                            }
+                        })
+                    }
+                   
+                } catch (error) {
+                    socket.on("error",()=>{
+                        console.log("soceket error while receiving event")
+                    })
                 }
             });
-        } catch (error) {
-            socket.emit(
-                ChatEventEnum.SOCKET_ERROR_EVENT,
-                error?.message || "Something went wrong while connecting to the socket."
-            );
-        }
+
+            socket.on("error",()=>{
+                console.log("soceket error while connecting socket")
+            })
+
+            console.log('new connection')
+
     });
 };
 
 
-const emitSocketEvent = (req: Request, roomId: string, event: ChatEventEnum, payload: any) => {
-    req.app.get("io").in(roomId).emit(event, payload);
-};
-
-export { initializeSocketIO, emitSocketEvent };
+export { initializeSocketIO };

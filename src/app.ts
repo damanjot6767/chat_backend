@@ -8,20 +8,14 @@ import compression from 'compression';
 import { passport } from "./passpost/index"
 import logger from 'morgan'
 import { initializeSocketIO } from "./socket/index";
-import { Server } from "socket.io";
+import { WebSocketServer } from "ws";
 import { chatRouter, messageRouter, userRouter } from "./routes";
 
 const app = express();
 
 const httpServer = createServer(app);
 
-const io = new Server(httpServer, {
-    pingTimeout: 60000,
-    cors: {
-        origin: process.env.CORS_ORIGIN,
-        credentials: true,
-    },
-});
+const io = new WebSocketServer({server:httpServer});
 
 app.set("io", io); // using set method to mount the `io` instance on the app to avoid usage of `global`
 

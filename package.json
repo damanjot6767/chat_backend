@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon ./src/index.ts",
-    "start": "node ./dist/index.js",
+    "start": "tsc && node ./dist/index.js",
     "compile": "tsc"
   },
   "keywords": [],
@@ -61,6 +61,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "ts-node": "^10.9.2",
+    "ws": "^8.17.1",
     "yaml": "^2.3.4"
   }
 }
