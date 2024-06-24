@@ -85,7 +85,7 @@ const initializeSocketIO = (io) => {
         });
 
         socket.on("error", (error) => {
-            console.log("Socket error:", error);
+            console.log("Socket error: ", error);
         });
 
         socket.on('close', (code, reason) => {
