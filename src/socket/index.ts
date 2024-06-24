@@ -89,7 +89,7 @@ const initializeSocketIO = (io) => {
         });
 
         socket.on('close', (code, reason) => {
-            console.log('Client disconnected', { code, reason });
+            console.log('Client disconnect', { code, reason });
             for (let chatId in conversationsObject) {
                 let sockets = conversationsObject[chatId];
                 sockets = sockets?.filter((item) => item !== socket);
