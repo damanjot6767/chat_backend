@@ -17,7 +17,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const constants_1 = require("../constants");
 const index_1 = require("../models/index");
 const api_error_1 = require("../utils/api-error");
-;
+const chat_model_1 = require("../models/chat.model");
 const conversationsObject = {};
 const authorizeEvent = (socket, data) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -29,62 +29,80 @@ const authorizeEvent = (socket, data) => __awaiter(void 0, void 0, void 0, funct
         }
         if (!token) {
             // Token is required for the socket to work
-            throw new api_error_1.ApiError(401, "Un-authorized handshake. Token is missing");
+            throw new api_error_1.ApiError(401, "Unauthorized handshake. Token is missing");
         }
         const decodedToken = jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_SECRET); // decode the token
-        const user = yield index_1.UserModel.findById(decodedToken).select("-password -refreshToken ");
+        const user = yield index_1.UserModel.findById(decodedToken).select("-password -refreshToken");
         // retrieve the user
         if (!user) {
-            throw new api_error_1.ApiError(401, "Un-authorized handshake. Token is invalid");
+            throw new api_error_1.ApiError(401, "Unauthorized handshake. Token is invalid");
         }
-        socket.user = user; // mount te user object to the socket
+        // create chat socket events
+        const chatsByUserId = yield (0, chat_model_1.getChatsByUserId)(user._id);
+        chatsByUserId === null || chatsByUserId === void 0 ? void 0 : chatsByUserId.forEach((ele) => {
+            if (conversationsObject[ele._id]) {
+                const sockets = [...conversationsObject[ele._id], socket];
+                conversationsObject[ele._id] = sockets;
+            }
+            else {
+                conversationsObject[ele._id] = [socket];
+            }
+        });
     }
     catch (error) {
-        socket;
+        console.log('Something went wrong', error);
     }
 });
 const initializeSocketIO = (io) => {
-    return io.on("connection", (socket) => __awaiter(void 0, void 0, void 0, function* () {
-        socket.on('message', (data) => __awaiter(void 0, void 0, void 0, function* () {
+    io.on("connection", (socket) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log('New connection');
+        socket.on('message', (res) => __awaiter(void 0, void 0, void 0, function* () {
             var _a, _b;
             try {
+                const data = JSON.parse(res);
                 if (data.event === constants_1.ChatEventEnum.CONNECTED_EVENT) {
                     yield authorizeEvent(socket, data);
-                    console.log('connected', 'new user connected ');
+                    console.log('Connected: new user connected', io.clients.size);
                 }
                 else if (data.event === constants_1.ChatEventEnum.JOIN_CHAT_EVENT) {
                     if (conversationsObject[data.chatId]) {
-                        conversationsObject[data.chatId] = conversationsObject[data.chatId].push(socket);
+                        const sockets = [...conversationsObject[data.chatId], socket];
+                        conversationsObject[data.chatId] = sockets;
                     }
                     else {
                         conversationsObject[data.chatId] = [socket];
                     }
                 }
                 else if (data.event === constants_1.ChatEventEnum.MESSAGE_RECEIVED_EVENT) {
-                    (_a = conversationsObject[data.chatId]) === null || _a === void 0 ? void 0 : _a.map((item) => {
+                    (_a = conversationsObject[data.chatId]) === null || _a === void 0 ? void 0 : _a.forEach((item) => {
                         if (item !== socket) {
-                            socket.send(data);
+                            item.send(JSON.stringify(data));
                         }
                     });
                 }
                 else if (data.event === constants_1.ChatEventEnum.TYPING_EVENT) {
-                    (_b = conversationsObject[data.chatId]) === null || _b === void 0 ? void 0 : _b.map((item) => {
+                    (_b = conversationsObject[data.chatId]) === null || _b === void 0 ? void 0 : _b.forEach((item) => {
                         if (item !== socket) {
-                            socket.send(data);
+                            item.send(JSON.stringify(data));
                         }
                     });
                 }
             }
             catch (error) {
-                socket.on("error", () => {
-                    console.log("soceket error while receiving event");
-                });
+                console.log('Error while handling message', error);
             }
         }));
-        socket.on("error", () => {
-            console.log("soceket error while connecting socket");
+        socket.on("error", (error) => {
+            console.log("Socket error:", error);
         });
-        console.log('new connection');
+        socket.on('close', (code, reason) => {
+            console.log('Client disconnected', { code, reason });
+            for (let chatId in conversationsObject) {
+                let sockets = conversationsObject[chatId];
+                sockets = sockets === null || sockets === void 0 ? void 0 : sockets.filter((item) => item !== socket);
+                conversationsObject[chatId] = sockets;
+            }
+        });
     }));
 };
 exports.initializeSocketIO = initializeSocketIO;
