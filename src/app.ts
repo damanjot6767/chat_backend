@@ -21,8 +21,7 @@ app.set("io", io); // using set method to mount the `io` instance on the app to 
 
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true
+    origin: "*"
 }));
 
 app.use(express.json({ limit: '20kb' }));
