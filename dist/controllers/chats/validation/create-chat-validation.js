@@ -35,31 +35,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateChatJoiValidation = void 0;
+exports.createChatJoiValidationObject = exports.CreateChatJoiValidation = void 0;
 const Joi = __importStar(require("joi"));
 const async_handler_1 = require("../../../utils/async-handler");
 const api_error_1 = require("../../../utils/api-error");
 const constants_1 = require("../../../constants");
 const mongoose_1 = __importDefault(require("mongoose"));
+const createChatJoiValidationObject = Joi.object({
+    name: Joi.string().optional(),
+    chatType: Joi.string().valid(constants_1.ChatType.GROUP, constants_1.ChatType.INDIVIDUAL).required(),
+    userIds: Joi.array()
+        .items(Joi.string().custom((value, helpers) => {
+        if (!mongoose_1.default.Types.ObjectId.isValid(value)) {
+            return helpers.error('id must be mongoose id'); // Custom error code for invalid ObjectId
+        }
+        return new mongoose_1.default.Types.ObjectId(value);
+        ;
+    }))
+        .when('chatType', {
+        is: constants_1.ChatType.INDIVIDUAL,
+        then: Joi.array().length(1).required(),
+        otherwise: Joi.array().min(2).required(),
+    }),
+});
+exports.createChatJoiValidationObject = createChatJoiValidationObject;
 const CreateChatJoiValidation = (0, async_handler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const chatObject = Joi.object({
-        name: Joi.string().optional(),
-        chatType: Joi.string().valid(constants_1.ChatType.GROUP, constants_1.ChatType.INDIVIDUAL).required(),
-        userIds: Joi.array()
-            .items(Joi.string().custom((value, helpers) => {
-            if (!mongoose_1.default.Types.ObjectId.isValid(value)) {
-                return helpers.error('id must be mongoose id'); // Custom error code for invalid ObjectId
-            }
-            return new mongoose_1.default.Types.ObjectId(value);
-            ;
-        }))
-            .when('chatType', {
-            is: constants_1.ChatType.INDIVIDUAL,
-            then: Joi.array().length(1).required(),
-            otherwise: Joi.array().min(2).required(),
-        }),
-    });
-    const { error, value } = chatObject.validate(req.body);
+    const { error, value } = createChatJoiValidationObject.validate(req.body);
     if (error) {
         throw new api_error_1.ApiError(400, error.message);
     }

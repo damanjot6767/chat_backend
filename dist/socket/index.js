@@ -93,10 +93,10 @@ const initializeSocketIO = (io) => {
             }
         }));
         socket.on("error", (error) => {
-            console.log("Socket error:", error);
+            console.log("Socket error: ", error);
         });
         socket.on('close', (code, reason) => {
-            console.log('Client disconnected', { code, reason });
+            console.log('Client disconnect', { code, reason });
             for (let chatId in conversationsObject) {
                 let sockets = conversationsObject[chatId];
                 sockets = sockets === null || sockets === void 0 ? void 0 : sockets.filter((item) => item !== socket);

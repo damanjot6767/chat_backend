@@ -8,7 +8,7 @@
       "outDir": "./dist"
     },
     "include": [
-      "src/swagger-output.json",
+      "swagger.json",
       "src/**/*"
     ],
     "exclude": [

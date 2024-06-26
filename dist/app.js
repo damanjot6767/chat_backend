@@ -13,15 +13,13 @@ const compression_1 = __importDefault(require("compression"));
 const morgan_1 = __importDefault(require("morgan"));
 const index_1 = require("./socket/index");
 const ws_1 = require("ws");
-const routes_1 = require("./routes");
 const app = (0, express_1.default)();
 const httpServer = (0, http_1.createServer)(app);
 exports.httpServer = httpServer;
 const io = new ws_1.WebSocketServer({ server: httpServer });
 app.set("io", io); // using set method to mount the `io` instance on the app to avoid usage of `global`
 app.use((0, cors_1.default)({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true
+    origin: "*"
 }));
 app.use(express_1.default.json({ limit: '20kb' }));
 app.use(express_1.default.urlencoded({ extended: true, limit: '20kb' }));
@@ -34,13 +32,11 @@ app.use((0, morgan_1.default)('dev'));
 // required for passport
 // app.use(passport.initialize());
 //-------------------Routes
-app.use("/v1/user", routes_1.userRouter);
-app.use("/v1/chat", routes_1.chatRouter);
-app.use("/v1/message", routes_1.messageRouter);
+const routes_1 = require("./routes");
+app.use(routes_1.allRouters);
 //-----------------Socket
 (0, index_1.initializeSocketIO)(io);
-const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
+//------------------Swagger setup
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
-const constants_1 = require("./constants");
-const specs = (0, swagger_jsdoc_1.default)(constants_1.swaggerOptions);
-app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(specs));
+const swagger_json_1 = __importDefault(require("../swagger.json"));
+app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_json_1.default));

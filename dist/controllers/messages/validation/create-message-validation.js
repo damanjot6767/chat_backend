@@ -35,33 +35,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateMessageJoiValidation = void 0;
+exports.createMessageJoiValidationObject = exports.CreateMessageJoiValidation = void 0;
 const Joi = __importStar(require("joi"));
 const async_handler_1 = require("../../../utils/async-handler");
 const api_error_1 = require("../../../utils/api-error");
 const mongoose_1 = __importDefault(require("mongoose"));
+const createMessageJoiValidationObject = Joi.object({
+    body: Joi.string().allow(null),
+    image: Joi.string().allow(null),
+    file: Joi.string().allow(null),
+    video: Joi.string().allow(null),
+    chatId: Joi.string().required().custom((value, helpers) => {
+        if (!mongoose_1.default.Types.ObjectId.isValid(value)) {
+            return helpers.error('id must be mongoose id');
+        }
+        return new mongoose_1.default.Types.ObjectId(value);
+        ;
+    }),
+    userIds: Joi.array().items(Joi.string().required().custom((value, helpers) => {
+        if (!mongoose_1.default.Types.ObjectId.isValid(value)) {
+            return helpers.error('id must be mongoose id');
+        }
+        return new mongoose_1.default.Types.ObjectId(value);
+        ;
+    }))
+}).or('body', 'image', 'file', 'video').required();
+exports.createMessageJoiValidationObject = createMessageJoiValidationObject;
 const CreateMessageJoiValidation = (0, async_handler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const messageObject = Joi.object({
-        body: Joi.string().allow(null),
-        image: Joi.string().allow(null),
-        file: Joi.string().allow(null),
-        video: Joi.string().allow(null),
-        chatId: Joi.string().required().custom((value, helpers) => {
-            if (!mongoose_1.default.Types.ObjectId.isValid(value)) {
-                return helpers.error('id must be mongoose id');
-            }
-            return new mongoose_1.default.Types.ObjectId(value);
-            ;
-        }),
-        userIds: Joi.array().items(Joi.string().required().custom((value, helpers) => {
-            if (!mongoose_1.default.Types.ObjectId.isValid(value)) {
-                return helpers.error('id must be mongoose id');
-            }
-            return new mongoose_1.default.Types.ObjectId(value);
-            ;
-        }))
-    }).or('body', 'image', 'file', 'video').required();
-    const { error, value } = messageObject.validate(req.body);
+    const { error, value } = createMessageJoiValidationObject.validate(req.body);
     if (error) {
         throw new api_error_1.ApiError(400, error.message);
     }

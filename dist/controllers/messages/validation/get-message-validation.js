@@ -35,39 +35,41 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetMessageByIdParamJoiValidation = exports.GetMessageByChatIdParamJoiValidation = void 0;
+exports.getMessageByChatIdParamJoiValidationObject = exports.getMessageByIdParamJoiValidationObject = exports.GetMessageByIdParamJoiValidation = exports.GetMessageByChatIdParamJoiValidation = void 0;
 const Joi = __importStar(require("joi"));
 const async_handler_1 = require("../../../utils/async-handler");
 const api_error_1 = require("../../../utils/api-error");
 const mongoose_1 = __importDefault(require("mongoose"));
+const getMessageByChatIdParamJoiValidationObject = Joi.object({
+    id: Joi.string().required().custom((value, helpers) => {
+        if (!mongoose_1.default.Types.ObjectId.isValid(value)) {
+            return helpers.error('id must be mongoose id');
+        }
+        return new mongoose_1.default.Types.ObjectId(value);
+        ;
+    }),
+});
+exports.getMessageByChatIdParamJoiValidationObject = getMessageByChatIdParamJoiValidationObject;
 const GetMessageByChatIdParamJoiValidation = (0, async_handler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const chatParam = Joi.object({
-        id: Joi.string().required().custom((value, helpers) => {
-            if (!mongoose_1.default.Types.ObjectId.isValid(value)) {
-                return helpers.error('id must be mongoose id');
-            }
-            return new mongoose_1.default.Types.ObjectId(value);
-            ;
-        }),
-    });
-    const { error, value } = chatParam.validate(req.params);
+    const { error, value } = getMessageByChatIdParamJoiValidationObject.validate(req.params);
     if (error) {
         throw new api_error_1.ApiError(400, error.message);
     }
     next();
 }));
 exports.GetMessageByChatIdParamJoiValidation = GetMessageByChatIdParamJoiValidation;
+const getMessageByIdParamJoiValidationObject = Joi.object({
+    id: Joi.string().required().custom((value, helpers) => {
+        if (!mongoose_1.default.Types.ObjectId.isValid(value)) {
+            return helpers.error('id must be mongoose id');
+        }
+        return new mongoose_1.default.Types.ObjectId(value);
+        ;
+    }),
+});
+exports.getMessageByIdParamJoiValidationObject = getMessageByIdParamJoiValidationObject;
 const GetMessageByIdParamJoiValidation = (0, async_handler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const chatParam = Joi.object({
-        id: Joi.string().required().custom((value, helpers) => {
-            if (!mongoose_1.default.Types.ObjectId.isValid(value)) {
-                return helpers.error('id must be mongoose id');
-            }
-            return new mongoose_1.default.Types.ObjectId(value);
-            ;
-        }),
-    });
-    const { error, value } = chatParam.validate(req.params);
+    const { error, value } = getMessageByIdParamJoiValidationObject.validate(req.params);
     if (error) {
         throw new api_error_1.ApiError(400, error.message);
     }

@@ -32,26 +32,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetChatByUserIdParamJoiValidation = exports.GetChatParamJoiValidation = void 0;
+exports.getChatParamJoiValidationObject = exports.getChatByUserIdParamJoiValidationObject = exports.GetChatByUserIdParamJoiValidation = exports.GetChatParamJoiValidation = void 0;
 const Joi = __importStar(require("joi"));
 const async_handler_1 = require("../../../utils/async-handler");
 const api_error_1 = require("../../../utils/api-error");
+const getChatParamJoiValidationObject = Joi.object({
+    id: Joi.string().required()
+});
+exports.getChatParamJoiValidationObject = getChatParamJoiValidationObject;
 const GetChatParamJoiValidation = (0, async_handler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const chatParam = Joi.object({
-        id: Joi.string().required()
-    });
-    const { error, value } = chatParam.validate(req.params);
+    const { error, value } = getChatParamJoiValidationObject.validate(req.params);
     if (error) {
         throw new api_error_1.ApiError(400, error.message);
     }
     next();
 }));
 exports.GetChatParamJoiValidation = GetChatParamJoiValidation;
+const getChatByUserIdParamJoiValidationObject = Joi.object({
+    userId: Joi.string().optional()
+});
+exports.getChatByUserIdParamJoiValidationObject = getChatByUserIdParamJoiValidationObject;
 const GetChatByUserIdParamJoiValidation = (0, async_handler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const chatParam = Joi.object({
-        userId: Joi.string().optional()
-    });
-    const { error, value } = chatParam.validate(req.params);
+    const { error, value } = getChatByUserIdParamJoiValidationObject.validate(req.params);
     if (error) {
         throw new api_error_1.ApiError(400, error.message);
     }

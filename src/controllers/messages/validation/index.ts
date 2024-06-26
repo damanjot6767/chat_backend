@@ -1,5 +1,4 @@
-import { CreateMessageJoiValidation } from "./create-message-validation";
-import { UpdateMessageJoiValidation } from "./update-message-validation";
-import { GetMessageByChatIdParamJoiValidation } from "./get-message-validation"
 
-export { CreateMessageJoiValidation, UpdateMessageJoiValidation, GetMessageByChatIdParamJoiValidation }
+export * from "./create-message-validation";
+export * from "./update-message-validation";
+export * from "./get-message-validation";

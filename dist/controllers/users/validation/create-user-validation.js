@@ -32,19 +32,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateUserJoiValidation = void 0;
+exports.createUserJoiValidationObject = exports.CreateUserJoiValidation = void 0;
 const Joi = __importStar(require("joi"));
 const async_handler_1 = require("../../../utils/async-handler");
 const api_error_1 = require("../../../utils/api-error");
+const createUserJoiValidationObject = Joi.object({
+    email: Joi.string().email().required(),
+    fullName: Joi.string().regex(/^[a-zA-Z]+$/).min(3).max(30).required(),
+    password: Joi.string().required(),
+    avatar: Joi.binary().min(1).max(5 * 1024 * 1024).optional(),
+    coverImage: Joi.binary().min(1).max(5 * 1024 * 1024).optional()
+});
+exports.createUserJoiValidationObject = createUserJoiValidationObject;
 const CreateUserJoiValidation = (0, async_handler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userObject = Joi.object({
-        email: Joi.string().email().required(),
-        fullName: Joi.string().regex(/^[a-zA-Z]+$/).min(3).max(30).required(),
-        password: Joi.string().required(),
-        avatar: Joi.binary().min(1).max(5 * 1024 * 1024).optional(),
-        coverImage: Joi.binary().min(1).max(5 * 1024 * 1024).optional()
-    });
-    const { error, value } = userObject.validate(req.body);
+    const { error, value } = createUserJoiValidationObject.validate(req.body);
     if (error) {
         throw new api_error_1.ApiError(400, error.message);
     }

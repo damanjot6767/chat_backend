@@ -32,15 +32,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateChatJoiValidation = void 0;
+exports.updateChatJoiValidationObject = exports.UpdateChatJoiValidation = void 0;
 const Joi = __importStar(require("joi"));
 const async_handler_1 = require("../../../utils/async-handler");
 const api_error_1 = require("../../../utils/api-error");
+const updateChatJoiValidationObject = Joi.object({
+    name: Joi.string()
+});
+exports.updateChatJoiValidationObject = updateChatJoiValidationObject;
 const UpdateChatJoiValidation = (0, async_handler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const chatObject = Joi.object({
-        name: Joi.string()
-    });
-    const { error, value } = chatObject.validate(req.body);
+    const { error, value } = updateChatJoiValidationObject.validate(req.body);
     if (error) {
         throw new api_error_1.ApiError(400, error.message);
     }

@@ -9,7 +9,6 @@ import { passport } from "./passpost/index"
 import logger from 'morgan'
 import { initializeSocketIO } from "./socket/index";
 import { WebSocketServer } from "ws";
-import { chatRouter, messageRouter, userRouter } from "./routes";
 
 const app = express();
 
@@ -39,22 +38,19 @@ app.use(logger('dev'));
 // app.use(passport.initialize());
 
 //-------------------Routes
-app.use("/v1/user", userRouter);
-app.use("/v1/chat", chatRouter);
-app.use("/v1/message", messageRouter);
+import { allRouters } from "./routes";
+
+app.use(allRouters);
 
 //-----------------Socket
 initializeSocketIO(io);
 
 
 //------------------Swagger setup
-import YAML from "yaml";
-import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { swaggerOptions } from "./constants";
+import swaggerDocs from "../swagger.json";
 
 
-const specs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 export { httpServer }

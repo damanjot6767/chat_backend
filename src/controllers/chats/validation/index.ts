@@ -1,5 +1,3 @@
-import { CreateChatJoiValidation } from "./create-chat-validation";
-import { UpdateChatJoiValidation } from "./update-user-validation";
-import { GetChatParamJoiValidation, GetChatByUserIdParamJoiValidation } from "./get-chat-validation"
-
-export { CreateChatJoiValidation, UpdateChatJoiValidation, GetChatParamJoiValidation, GetChatByUserIdParamJoiValidation }
+export * from "./create-chat-validation";
+export * from "./update-user-validation";
+export * from "./get-chat-validation";

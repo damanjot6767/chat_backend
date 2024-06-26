@@ -2,13 +2,12 @@ import * as Joi from 'joi';
 import { asyncHandler } from '../../../utils/async-handler';
 import { ApiError } from '../../../utils/api-error';
 
+const updateChatJoiValidationObject = Joi.object({
+    name: Joi.string()
+})
 const UpdateChatJoiValidation = asyncHandler(async (req, res, next) => {
 
-    const chatObject = Joi.object({
-        name: Joi.string()
-    })
-
-    const { error, value } = chatObject.validate(req.body);
+    const { error, value } = updateChatJoiValidationObject.validate(req.body);
 
     if (error) {
         throw new ApiError(400, error.message)
@@ -16,4 +15,4 @@ const UpdateChatJoiValidation = asyncHandler(async (req, res, next) => {
     next()
 })
 
-export { UpdateChatJoiValidation }
+export { UpdateChatJoiValidation, updateChatJoiValidationObject }
