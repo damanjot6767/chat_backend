@@ -14,7 +14,7 @@ const app = express();
 
 const httpServer = createServer(app);
 
-const io = new WebSocketServer({server:httpServer});
+const io = new WebSocketServer({ server: httpServer });
 
 app.set("io", io); // using set method to mount the `io` instance on the app to avoid usage of `global`
 
@@ -50,7 +50,11 @@ initializeSocketIO(io);
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocs from "../swagger.json";
 
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.6.0/swagger-ui.min.css";
+app.use('/documentation', swaggerUi.serve, swaggerUi.setup(swaggerDocs, {
+    customCss:
+        '.swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }',
+    customCssUrl: CSS_URL,
+}));
 
 export { httpServer }

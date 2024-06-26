@@ -60,7 +60,7 @@
     "socket.io": "^4.7.4",
     "swagger-autogen": "^2.23.7",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^4.6.3",
+    "swagger-ui-express": "^4.6.0",
     "ts-node": "^10.9.2",
     "ws": "^8.17.1",
     "yaml": "^2.3.4"
