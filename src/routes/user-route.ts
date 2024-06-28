@@ -1,5 +1,5 @@
 import { changeForgetPassword, confirmMail, getAllUsers, getUser, handleSocialLogin, loginUser, registerUser, updateUser, forgetPassword, verifyEmail } from "../controllers/users/user-controller";
-import { CreateUserJoiValidation, LoginUserJoiValidation, UpdateUserJoiValidation } from "../controllers/users/validation";
+import { CreateUserJoiValidation, GetUserByIdParamJoiValidation, LoginUserJoiValidation, UpdateUserJoiValidation, getUserByIdParamJoiValidationObject } from "../controllers/users/validation";
 import { verifyJWT, verifyMailJWT } from "../middlewares/auth-middleware";
 import passport from "passport";
 import { loginUserJoiValidationObject } from "../controllers/users/validation/login-user-validation";
@@ -94,11 +94,11 @@ const routes = [
 		handler: verifyEmail
 	},
     {
-		method: 'post',
+		method: 'get',
 		path: '/v1/user/:id',
 		joiSchemaForSwagger: {
 			group: 'User',
-			description: `Route to change forget user password.`,
+			description: `Route get users and user by id.`,
 		},
         middlewares : [verifyJWT],
 		auth: true,
@@ -109,10 +109,11 @@ const routes = [
 		path: '/v1/user/update/:id',
 		joiSchemaForSwagger: {
 			group: 'User',
+			params: getUserByIdParamJoiValidationObject,
             body: updateUserJoiValidationObject,
 			description: `Route to change forget user password.`,
 		},
-        middlewares : [verifyJWT, UpdateUserJoiValidation],
+        middlewares : [verifyJWT ,GetUserByIdParamJoiValidation, UpdateUserJoiValidation],
 		auth: true,
 		handler: getUser
 	},

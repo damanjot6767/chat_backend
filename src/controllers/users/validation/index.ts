@@ -1,5 +1,4 @@
-import { CreateUserJoiValidation } from "./create-user-validation";
-import { LoginUserJoiValidation } from "./login-user-validation";
-import { UpdateUserJoiValidation } from "./update-user-validation";
-
-export { CreateUserJoiValidation, LoginUserJoiValidation, UpdateUserJoiValidation }
+export * from "./create-user-validation";
+export * from "./login-user-validation";
+export * from "./update-user-validation";
+export * from "./get-user-validation"
