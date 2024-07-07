@@ -7,6 +7,7 @@ import { UserModel } from "../models/index";
 import { ApiError } from "../utils/api-error";
 import { ChatResponseDto, CreateChatDto } from "../controllers/chats/dto";
 import { getChatsByUserId } from "../models/chat.model";
+import { publishMessageWithChatIdToChannel, setSocketInstanceWithChatId, subscribeToChannelMessageWithChatId } from "../controllers/chats/chat-redis-service";
 
 const conversationsObject = {};
 
@@ -33,16 +34,12 @@ const authorizeEvent = async (socket, data) => {
             throw new ApiError(401, "Unauthorized handshake. Token is invalid");
         }
 
-        // create chat socket events
+        // create channel with chatId
         const chatsByUserId = await getChatsByUserId(user._id);
 
-        chatsByUserId?.forEach((ele) => {
-            if (conversationsObject[ele._id]) {
-                const sockets = [...conversationsObject[ele._id], socket];
-                conversationsObject[ele._id] = sockets;
-            } else {
-                conversationsObject[ele._id] = [socket];
-            }
+        chatsByUserId?.forEach(async(ele) => {
+            await setSocketInstanceWithChatId(ele?._id.toString(), socket)
+            await subscribeToChannelMessageWithChatId(ele._id.toString())
         });
     } catch (error) {
         console.log('Something went wrong', error);
@@ -59,25 +56,17 @@ const initializeSocketIO = (io) => {
                 if (data.event === ChatEventEnum.CONNECTED_EVENT) {
                     await authorizeEvent(socket, data);
                     console.log('Connected: new user connected', io.clients.size);
-                } else if (data.event === ChatEventEnum.JOIN_CHAT_EVENT) {
-                    if (conversationsObject[data.chatId]) {
-                        const sockets = [...conversationsObject[data.chatId], socket];
-                        conversationsObject[data.chatId] = sockets;
-                    } else {
-                        conversationsObject[data.chatId] = [socket];
-                    }
+                } else if (data.ievent === ChatEventEnum.JOIN_CHAT_EVENT) {
+                    await setSocketInstanceWithChatId(data.chatId, socket)
                 } else if (data.event === ChatEventEnum.MESSAGE_RECEIVED_EVENT) {
-                    conversationsObject[data.chatId]?.forEach((item) => {
-                        if (item !== socket) {
-                            item.send(JSON.stringify(data));
-                        }
-                    });
+                    // conversationsObject[data.chatId]?.forEach((item) => {
+                    //     if (item !== socket) {
+                    //         item.send(JSON.stringify(data));
+                    //     }
+                    // });
+                    await publishMessageWithChatIdToChannel({...data, socket})
                 } else if (data.event === ChatEventEnum.TYPING_EVENT) {
-                    conversationsObject[data.chatId]?.forEach((item) => {
-                        if (item !== socket) {
-                            item.send(JSON.stringify(data));
-                        }
-                    });
+                    await publishMessageWithChatIdToChannel({...data, socket})
                 }
             } catch (error) {
                 console.log('Error while handling message', error);

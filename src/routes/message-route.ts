@@ -15,8 +15,8 @@ const routes = [
 			// payloadDocumentation: `## Request body will contains: \n \n **email:** email of the user \n **password:** password of the user \n **isMobile:** Is request is coming from mobile application or not? \n **deviceToken:** user's device token for push notifications \n **appType:** from which application user is requesting login \n`,
 			model: 'Message'
 		},
-        middlewares : [CreateMessageJoiValidation],
-		auth: false,
+        middlewares : [verifyJWT,CreateMessageJoiValidation],
+		auth: true,
 		handler: createMessage
 	},
     {
