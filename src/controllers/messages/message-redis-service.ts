@@ -1,3 +1,4 @@
+import { createManyMessage } from "../../models/message.model";
 import { redisInstance } from "../../redis/redis";
 import { ApiError } from "../../utils/api-error";
 import { generateMongooseID } from "../../utils/generate-mongo-id";
@@ -14,8 +15,14 @@ export const createDummyMessage = (payload: any)=>{
 export const pushMessageRedis = async (payload:any): Promise<any> => {
     try {
         const new_payload = createDummyMessage(payload)
-
         await redisInstance.rpush(payload.chatId, JSON.stringify(new_payload))
+        
+        const isCacheMessages = await pullMessageRedis(payload?.chatId);
+
+        if(isCacheMessages?.length>=100){
+            const response = await createManyMessage(isCacheMessages);
+            await deleteMessagesRedis(payload?.chatId);
+        }
         return new_payload
     } catch (error) {
         console.log('error',error)

@@ -176,7 +176,8 @@ export const getMessageById = async (id: string): Promise<MessageResponseDto> =>
 export const getMessagesByChatId = async (id: string, page: number = 1, limit: number = 10): Promise<MessageResponseDto[]> => {
     try {
         const isCacheMessages = await pullMessageRedis(id);
-        if(isCacheMessages?.length) return isCacheMessages
+        if(isCacheMessages?.length>=100) return isCacheMessages;
+        limit=100-isCacheMessages?.length
         const message: any = await MessageModel.aggregate([
             {
                 $match: {
@@ -226,18 +227,11 @@ export const getMessagesByChatId = async (id: string, page: number = 1, limit: n
 
 export const createManyMessage = async (payload: CreateMessageDto): Promise<any> => {
     try {
-        const isCache = await pushMessageRedis(payload);
-
-        const isCacheMessages = await pullMessageRedis(payload?.chatId);
-
-        if(isCacheMessages?.length>=100){
-            const response = await MessageModel.insertMany(isCacheMessages);
-            await deleteMessagesRedis(payload?.chatId);
+       
+            const response = await MessageModel.insertMany(payload);
             return response
         }
-       
-        return isCache;
-    } catch (error) {
+    catch (error) {
         throw new ApiError(500, "Something went wrong while create messages")
     }
 }
