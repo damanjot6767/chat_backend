@@ -2,12 +2,18 @@ import { redisInstance } from "../../redis/redis";
 import { ApiError } from "../../utils/api-error";
 import { generateMongooseID } from "../../utils/generate-mongo-id";
 
-export const pushMessageRedis = async (payload:any): Promise<any> => {
-    try {
+export const createDummyMessage = (payload: any)=>{
         const new_payload = {...payload} ;
         new_payload['_id'] = generateMongooseID();
         new_payload['createdAt'] = new Date();
         new_payload['updatedAt'] = new Date();
+
+        return new_payload
+}
+
+export const pushMessageRedis = async (payload:any): Promise<any> => {
+    try {
+        const new_payload = createDummyMessage(payload)
 
         await redisInstance.rpush(payload.chatId, JSON.stringify(new_payload))
         return new_payload

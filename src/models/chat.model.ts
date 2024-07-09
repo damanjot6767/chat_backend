@@ -270,11 +270,11 @@ export const getChatByUserIds = async (userIds: string[]): Promise<any> => {
 }
 export const getChatById = async (id: string): Promise<any> => {
     try {
-        const isCache = await getChatByIdRedis(id); 
-        if(isCache) return isCache;
+        // const isCache = await getChatByIdRedis(id); 
+        // if(isCache) return isCache;
 
         const response =  await ChatModel.findOne({ _id: id })
-        await setChatByIdRedis(response)
+        // await setChatByIdRedis(response)
         return response
     } catch (error) {
         throw new ApiError(500, "Something went wrong while finding chat by id")
