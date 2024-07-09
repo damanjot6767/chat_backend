@@ -236,7 +236,14 @@ export const createManyMessage = async (payload: CreateMessageDto): Promise<any>
     }
 }
 
-export const createMessage = <MesssagePayload>(values: MesssagePayload): Promise<CreateMessageResponseDto> => MessageModel.create(values);
+export const createMessage = async <MesssagePayload>(values: MesssagePayload): Promise<CreateMessageResponseDto> => {
+    try {
+        const res = await MessageModel.create(values);
+        return res
+    } catch (error) {
+        console.log("something went wrong while save message", values)
+    }
+}
 
 export const deleteMessageById = (id: string): any => MessageModel.findOneAndDelete({ _id: id });
 export const updateMessageById = <MesssagePayload>(id: string, values: MesssagePayload): Promise<CreateMessageResponseDto> => MessageModel.findByIdAndUpdate(id, values, { new: true });

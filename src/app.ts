@@ -45,10 +45,14 @@ app.use(allRouters);
 //-----------------Socket
 initializeSocketIO(io);
 
+//----------------Kafka connnect
+import { connectKafka } from "./kafka/kafka";
+connectKafka()
 
 //------------------Swagger setup
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocs from "../swagger.json";
+
 
 const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.6.0/swagger-ui.min.css";
 app.use('/documentation', swaggerUi.serve, swaggerUi.setup(swaggerDocs, {

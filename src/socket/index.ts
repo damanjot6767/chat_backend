@@ -2,7 +2,6 @@ import cookie from "cookie";
 import jwt from "jsonwebtoken";
 import WebSocket, { WebSocketServer } from "ws";
 import { ChatEventEnum } from "../constants";
-import { Request } from "express";
 import { UserModel } from "../models/index";
 import { ApiError } from "../utils/api-error";
 import { ChatResponseDto, CreateChatDto } from "../controllers/chats/dto";
@@ -11,6 +10,8 @@ import { redisSubscriberInstance } from "../redis/redis";
 import { createHasSet, getHasSet, publishToChannel, removeHasSet, subscribeToChannel } from "../redis/redis-pub-sub";
 import { json } from "body-parser";
 import { pushMessageRedis } from "../controllers/messages/message-redis-service";
+import { consumeMessages, produceMessage } from "../kafka/kafka";
+import { createMessage } from "../models/message.model"
 
 const socketObject = {};
 
@@ -109,6 +110,7 @@ const initializeSocketIO = (io) => {
                     await authorizeEvent(socket, data);
                 } else if (data.event === ChatEventEnum.MESSAGE_RECEIVED_EVENT) {
                     await publishToChannel({channelName: ChatEventEnum.MESSAGE_RECEIVED_EVENT, data: data})
+                    await produceMessage({topic: ChatEventEnum.MESSAGE_RECEIVED_EVENT, data: data})
                 } else if (data.event === ChatEventEnum.TYPING_EVENT) {
                     await publishToChannel({channelName: ChatEventEnum.TYPING_EVENT, data: data})
                 }
@@ -130,6 +132,9 @@ const initializeSocketIO = (io) => {
 
     //--------------------listen message come from channel
     listenToChannel()
+
+    //--------------------listten message from kafka producer
+    consumeMessages({topic: ChatEventEnum.MESSAGE_RECEIVED_EVENT, callBack:createMessage})
 };
 
 export { initializeSocketIO };
