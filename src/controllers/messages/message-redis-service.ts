@@ -16,8 +16,6 @@ export const pushMessageRedis = async (payload:any): Promise<any> => {
     try {
         const new_payload = createDummyMessage(payload)
         await redisInstance.rpush(payload.chatId, JSON.stringify(new_payload))
-        
-        const isCacheMessages = await pullMessageRedis(payload?.chatId);
         return new_payload
     } catch (error) {
         console.log('error',error)

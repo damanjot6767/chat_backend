@@ -1,6 +1,7 @@
 import { Kafka } from 'kafkajs';
 import fs from 'fs';
 import path from 'path';
+import { redisInstance } from '../redis/redis';
 
 const caCertPath = path.resolve(__dirname, './ca.pem');
 
@@ -15,8 +16,6 @@ const kafkaInstance = new Kafka({
     password: process.env.KAFKA_PASSWORD,
     mechanism: 'plain',
   },
-  connectionTimeout: 3000,
-  authenticationTimeout: 3000,
   retry: {
     retries: 8, // Increase the number of retries
     factor: 0.2, // Factor to multiply the backoff
@@ -44,8 +43,18 @@ const produceMessage = async ({ topic, data }: { topic: string; data: any }) => 
 const consumeMessages = async ({ topic, callBack }: { topic: string; callBack: Function }) => {
   await consumer.subscribe({ topic, fromBeginning: true });
   await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      await callBack(JSON.parse(message.value.toString()).data);
+    eachMessage: async ({ topic, partition, message, pause }) => {
+     try {
+      const data = JSON.parse(message.value.toString()).data;
+      const res = await callBack(data);
+      await redisInstance.rpop(data.chatId)
+     } catch (error) {
+      consumer.pause([{topic: topic}]);
+      setTimeout(()=>{
+        consumer.resume([{topic: topic}]);
+      },5000)
+      console.log("someting went wront to store data")
+     }
     },
   });
 };
